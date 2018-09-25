@@ -1,6 +1,7 @@
 import { Lox } from './Lox';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
+import { isDigit } from './utils';
 
 const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
   '(': TT.LEFT_PAREN,
@@ -93,8 +94,13 @@ export class Scanner {
         this.line++;
         break;
 
-      // Unexpected character
+      // Other use cases
       default:
+        if (isDigit(char)) {
+          this.number();
+          break;
+        }
+
         Lox.error(this.line, `Unexpected character: ${char}.`);
         break;
     }
@@ -128,6 +134,14 @@ export class Scanner {
     return this.source[this.current];
   }
 
+  peekNext(): string {
+    if (this.current + 1 >= this.source.length) {
+      return '\0';
+    }
+
+    return this.source[this.current + 1];
+  }
+
   /**
    * Iterates on characters until it finds a string delimiter. If a newline
    * is found in the string, increment the line counter
@@ -151,5 +165,26 @@ export class Scanner {
     // Add the string token
     const value = this.source.substring(this.start + 1, this.current - 1);
     this.addToken(TT.STRING, value);
+  }
+
+  number() {
+    // Consume all the digits
+    while (isDigit(this.peek())) {
+      this.advance();
+    }
+
+    // Consume the fractional part
+    if (this.peek() === '.' && isDigit(this.peekNext())) {
+      this.advance();
+
+      while (isDigit(this.peek())) {
+        this.advance();
+      }
+    }
+
+    this.addToken(
+      TT.NUMBER,
+      Number.parseFloat(this.source.substring(this.start, this.current))
+    );
   }
 }
