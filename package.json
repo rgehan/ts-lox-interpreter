@@ -5,10 +5,11 @@
   "author": "Renan GEHAN <rgehan94@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^10.11.0"
+    "@types/node": "^10.11.0",
+    "rimraf": "^2.6.2"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist/ && tsc",
     "watch": "tsc --watch"
   }
 }

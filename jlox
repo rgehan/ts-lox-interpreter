@@ -1,0 +1,15 @@
+#! /usr/bin/env node
+
+const { Lox } = require('./dist/Lox.js');
+
+const arguments = process.argv.slice(2);
+const interpreter = new Lox();
+
+if (arguments.length === 1) {
+  interpreter.runFile(arguments[0]);
+} else if (arguments.length === 0) {
+  interpreter.runPrompt();
+} else {
+  console.log('Usage: jlox [script]');
+  process.exit(64);
+} 
