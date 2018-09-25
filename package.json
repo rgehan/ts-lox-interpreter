@@ -1,0 +1,14 @@
+{
+  "name": "lox-interpreter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Renan GEHAN <rgehan94@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^10.11.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  }
+}
