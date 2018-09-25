@@ -77,6 +77,11 @@ export class Scanner {
         }
         break;
 
+      // Handle string literals
+      case '"':
+        this.string();
+        break;
+
       // Ignore white-spaces
       case ' ':
       case '\r':
@@ -87,8 +92,10 @@ export class Scanner {
       case '\n':
         this.line++;
         break;
+
+      // Unexpected character
       default:
-        Lox.error(this.line, 'Unexpected character.');
+        Lox.error(this.line, `Unexpected character: ${char}.`);
         break;
     }
   }
@@ -98,7 +105,7 @@ export class Scanner {
     return this.source[this.current - 1];
   }
 
-  addToken(type: TT, literal: object = null) {
+  addToken(type: TT, literal: any = null) {
     const text: string = this.source.substring(this.start, this.current);
     const token = new Token(type, text, literal, this.line);
     this.tokens.push(token);
@@ -119,5 +126,30 @@ export class Scanner {
     }
 
     return this.source[this.current];
+  }
+
+  /**
+   * Iterates on characters until it finds a string delimiter. If a newline
+   * is found in the string, increment the line counter
+   */
+  string() {
+    while (this.peek() !== '"' && !this.isAtEnd()) {
+      if (this.peek() === '\n') {
+        this.line++;
+      }
+
+      this.advance();
+    }
+
+    if (this.isAtEnd()) {
+      Lox.error(this.line, 'Unterminated string.');
+    }
+
+    // Advances over the closing string delimiter
+    this.advance();
+
+    // Add the string token
+    const value = this.source.substring(this.start + 1, this.current - 1);
+    this.addToken(TT.STRING, value);
   }
 }
