@@ -1,7 +1,7 @@
 import { Lox } from './Lox';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
-import { isDigit } from './utils';
+import { isDigit, isAlphaNumeric } from './utils';
 
 const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
   '(': TT.LEFT_PAREN,
@@ -14,6 +14,25 @@ const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
   '+': TT.PLUS,
   ';': TT.SEMICOLON,
   '*': TT.STAR,
+};
+
+const KEYWORDS: { [k: string]: TT } = {
+  and: TT.AND,
+  class: TT.CLASS,
+  else: TT.ELSE,
+  false: TT.FALSE,
+  for: TT.FOR,
+  fun: TT.FUN,
+  if: TT.IF,
+  nil: TT.NIL,
+  or: TT.OR,
+  print: TT.PRINT,
+  return: TT.RETURN,
+  super: TT.SUPER,
+  this: TT.THIS,
+  true: TT.TRUE,
+  var: TT.VAR,
+  while: TT.WHILE,
 };
 
 export class Scanner {
@@ -98,6 +117,11 @@ export class Scanner {
       default:
         if (isDigit(char)) {
           this.number();
+          break;
+        }
+
+        if (isAlphaNumeric(char)) {
+          this.identifier();
           break;
         }
 
@@ -186,5 +210,17 @@ export class Scanner {
       TT.NUMBER,
       Number.parseFloat(this.source.substring(this.start, this.current))
     );
+  }
+
+  identifier() {
+    while (isAlphaNumeric(this.peek())) {
+      this.advance();
+    }
+
+    // Extract the identifier value and check if it's a keyword
+    const text = this.source.substring(this.start, this.current);
+    const tokenType = KEYWORDS[text] || TT.IDENTIFIER;
+
+    this.addToken(tokenType);
   }
 }
