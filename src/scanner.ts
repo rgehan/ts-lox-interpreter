@@ -125,7 +125,7 @@ export class Scanner {
           break;
         }
 
-        Lox.error(this.line, `Unexpected character: ${char}.`);
+        Lox.errorAtLine(this.line, `Unexpected character: ${char}.`);
         break;
     }
   }
@@ -180,7 +180,7 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      Lox.error(this.line, 'Unterminated string.');
+      Lox.errorAtLine(this.line, 'Unterminated string.');
     }
 
     // Advances over the closing string delimiter
