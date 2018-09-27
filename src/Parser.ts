@@ -4,7 +4,8 @@ import { TokenType as TT } from './TokenType';
 import * as Expr from './Expr';
 
 /*
- * expression     → equality ;
+ * expression     → block ;
+ * block          → equality ( "," equality)* ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
  * addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -34,7 +35,19 @@ export class Parser {
   }
 
   private expression(): Expr.Expr {
-    return this.equality();
+    return this.block();
+  }
+
+  private block(): Expr.Expr {
+    let expr: Expr.Expr = this.equality();
+
+    while (this.match(TT.COMMA)) {
+      const operator: Token = this.previous();
+      const right: Expr.Expr = this.equality();
+      expr = new Expr.Binary(expr, operator, right);
+    }
+
+    return expr;
   }
 
   private equality(): Expr.Expr {
