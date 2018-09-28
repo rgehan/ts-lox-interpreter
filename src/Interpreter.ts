@@ -95,6 +95,8 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
           expr.operator,
           'Operands must be two numbers or two strings'
         );
+      case TT.COMMA:
+        return right;
     }
   }
 
