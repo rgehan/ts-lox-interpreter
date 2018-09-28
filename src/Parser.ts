@@ -193,7 +193,7 @@ export class Parser {
    * @param message What error is reported if there is no such token to consume
    */
   private consume(type: TT, message: string) {
-    if (!this.match(type)) {
+    if (!this.check(type)) {
       throw this.error(this.peek(), message);
     }
 
