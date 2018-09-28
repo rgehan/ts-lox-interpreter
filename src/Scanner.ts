@@ -90,6 +90,7 @@ export class Scanner {
       case '/':
         if (!this.match('/')) {
           this.addToken(TT.SLASH);
+          break;
         }
 
         while (this.peek() !== '\n' && !this.isAtEnd()) {
