@@ -5,8 +5,8 @@ import { Scanner } from './Scanner';
 import { Parser } from './Parser';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
-import * as Expr from './Expr';
-import { AstPrinter } from './AstPrinter';
+import * as Stmt from './Stmt';
+// import { AstPrinter } from './AstPrinter';
 import { Interpreter, RuntimeError } from './Interpreter';
 
 export class Lox {
@@ -30,12 +30,12 @@ export class Lox {
     // }
 
     const parser: Parser = new Parser(tokens);
-    const expression: Expr.Expr = parser.parse();
+    const statements: Stmt.Stmt[] = parser.parse();
 
     // console.log('\n## AST:');
     // console.log(new AstPrinter().print(expression));
 
-    Lox.interpreter.interpret(expression);
+    Lox.interpreter.interpret(statements);
   }
 
   /**

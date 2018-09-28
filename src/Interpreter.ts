@@ -1,28 +1,27 @@
 import { Lox } from './Lox';
 import * as Expr from './Expr';
+import * as Stmt from './Stmt';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 
-export class Interpreter implements Expr.Visitor<any> {
-  interpret(expression: Expr.Expr) {
+export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
+  interpret(statements: Stmt.Stmt[]) {
     try {
-      const value = this.evaluate(expression);
-      console.log(this.stringify(value));
+      statements.forEach(statement => {
+        this.execute(statement);
+      });
     } catch (error) {
       Lox.runtimeError(error);
     }
   }
 
-  private evaluate(expr: Expr.Expr): any {
-    return expr.accept(this);
+  visitExpressionStmt(stmt: Stmt.Expression) {
+    this.evaluate(stmt.expression);
   }
 
-  private stringify(object: any): string {
-    if (object === null) {
-      return 'nil';
-    }
-
-    return object.toString();
+  visitPrintStmt(stmt: Stmt.Print) {
+    const value = this.evaluate(stmt.expression);
+    console.log(this.stringify(value));
   }
 
   visitGroupingExpr(expr: Expr.Grouping): any {
@@ -122,6 +121,22 @@ export class Interpreter implements Expr.Visitor<any> {
       object !== false &&
       object !== 0
     );
+  }
+
+  private evaluate(expr: Expr.Expr): any {
+    return expr.accept(this);
+  }
+
+  private execute(stmt: Stmt.Stmt): void {
+    return stmt.accept(this);
+  }
+
+  private stringify(object: any): string {
+    if (object === null) {
+      return 'nil';
+    }
+
+    return object.toString();
   }
 }
 
