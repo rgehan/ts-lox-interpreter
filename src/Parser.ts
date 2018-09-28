@@ -2,8 +2,13 @@ import { Lox } from './Lox';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import * as Expr from './Expr';
+import * as Stmt from './Stmt';
 
 /*
+ * program        → statement* EOF ;
+ * statement      → exprStmt | printStmt ;
+ * exprStmt       → expression ";" ;
+ * printStmt      → "print" expression ";" ;
  * expression     → block ;
  * block          → equality ( "," equality)* ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -26,12 +31,34 @@ export class Parser {
     this.tokens = tokens;
   }
 
-  parse(): Expr.Expr {
-    try {
-      return this.expression();
-    } catch (error) {
-      return null;
+  parse(): Stmt.Stmt[] {
+    const statements: Stmt.Stmt[] = [];
+
+    while (!this.isAtEnd()) {
+      statements.push(this.statement());
     }
+
+    return statements;
+  }
+
+  private statement(): Stmt.Stmt {
+    if (this.match(TT.PRINT)) {
+      return this.printStatement();
+    }
+
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Stmt.Stmt {
+    const value: Expr.Expr = this.expression();
+    this.consume(TT.SEMICOLON, 'Expect ";" after value.');
+    return new Stmt.Print(value);
+  }
+
+  private expressionStatement(): Stmt.Stmt {
+    const expr: Expr.Expr = this.expression();
+    this.consume(TT.SEMICOLON, 'Expect ";" after value.');
+    return new Stmt.Expression(expr);
   }
 
   private expression(): Expr.Expr {
