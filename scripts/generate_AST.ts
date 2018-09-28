@@ -11,6 +11,11 @@ defineAST('Expr', [
   'Unary:    Token operator, Expr right',
 ]);
 
+defineAST('Stmt', [
+  'Expression: Expr expression',
+  'Print: Expr expression',
+]);
+
 function defineAST(baseName, types) {
   const filepath = path.resolve(__dirname, `../src/${baseName}.ts`);
 
