@@ -99,7 +99,7 @@ export class Parser {
   }
 
   private unary(): Expr.Expr {
-    if (this.match(TT.BANG, TT.PLUS)) {
+    if (this.match(TT.BANG, TT.MINUS)) {
       const operator: Token = this.previous();
       const right: Expr.Expr = this.unary();
       return new Expr.Unary(operator, right);

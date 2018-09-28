@@ -7,6 +7,7 @@ import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import * as Expr from './Expr';
 import { AstPrinter } from './AstPrinter';
+import { Interpreter } from './Interpreter';
 
 export class Lox {
   static hadError: boolean = false;
@@ -30,6 +31,9 @@ export class Lox {
 
     console.log('\n## AST:');
     console.log(new AstPrinter().print(expression));
+
+    console.log('\n## Result:');
+    console.log(new Interpreter().evaluate(expression));
   }
 
   /**
