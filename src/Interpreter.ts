@@ -70,7 +70,13 @@ export class Interpreter implements Expr.Visitor<any> {
         return left !== right;
       case TT.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
+
+        if (right === 0) {
+          throw new RuntimeError(expr.operator, 'Cannot divide by zero.');
+        }
+
         return Number(left) / Number(right);
+
       case TT.STAR:
         this.checkNumberOperands(expr.operator, left, right);
         return Number(left) * Number(right);
