@@ -7,10 +7,13 @@ import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import * as Expr from './Expr';
 import { AstPrinter } from './AstPrinter';
-import { Interpreter } from './Interpreter';
+import { Interpreter, RuntimeError } from './Interpreter';
 
 export class Lox {
   static hadError: boolean = false;
+  static hadRuntimeError: boolean = false;
+
+  static interpreter: Interpreter = new Interpreter();
 
   /**
    * Run some Lox source
@@ -21,19 +24,18 @@ export class Lox {
     const tokens: Token[] = scanner.scanTokens();
 
     // Print the tokens
-    console.log('## Tokens:');
-    for (const token of tokens) {
-      console.log(token);
-    }
+    // console.log('## Tokens:');
+    // for (const token of tokens) {
+    //   console.log(token);
+    // }
 
     const parser: Parser = new Parser(tokens);
     const expression: Expr.Expr = parser.parse();
 
-    console.log('\n## AST:');
-    console.log(new AstPrinter().print(expression));
+    // console.log('\n## AST:');
+    // console.log(new AstPrinter().print(expression));
 
-    console.log('\n## Result:');
-    console.log(new Interpreter().evaluate(expression));
+    Lox.interpreter.interpret(expression);
   }
 
   /**
@@ -47,6 +49,10 @@ export class Lox {
     if (Lox.hadError) {
       process.exit(65);
     }
+
+    if (Lox.hadRuntimeError) {
+      process.exit(70);
+    }
   }
 
   /**
@@ -55,7 +61,7 @@ export class Lox {
   runPrompt() {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout,
+      output: process.stdout
     });
 
     Lox.hadError = false;
@@ -87,5 +93,10 @@ export class Lox {
   static report(line: number, where: string, message: string) {
     console.log(`[line ${line}] Error${where}: ${message}`);
     Lox.hadError = true;
+  }
+
+  static runtimeError(error: RuntimeError) {
+    console.error(`${error.message}\n[line ${error.token.line}]`);
+    Lox.hadRuntimeError = true;
   }
 }
