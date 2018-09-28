@@ -7,6 +7,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.116",
     "@types/node": "^10.11.0",
+    "ndb": "^1.0.26",
     "rimraf": "^2.6.2"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
   },
   "scripts": {
     "build": "rimraf dist/ && tsc",
+    "debug": "yarn build && ndb node ./jlox",
     "watch": "tsc --watch"
   }
 }
