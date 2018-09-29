@@ -22,12 +22,6 @@ export class Lox {
     const scanner: Scanner = new Scanner(source);
     const tokens: Token[] = scanner.scanTokens();
 
-    // Print the tokens
-    // console.log('## Tokens:');
-    // for (const token of tokens) {
-    //   console.log(token);
-    // }
-
     const parser: Parser = new Parser(tokens);
     const statements: Stmt.Stmt[] = parser.parse();
 
