@@ -6,14 +6,20 @@ import { Lox } from './Lox';
 
 type Scope = Map<string, boolean>;
 type Resolveable = Expr.Expr | Stmt.Stmt;
+enum FunctionType {
+  NONE,
+  FUNCTION,
+}
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   interpreter: Interpreter;
   scopes: Stack<Scope>;
+  currentFunction: FunctionType;
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
     this.scopes = new Stack();
+    this.currentFunction = FunctionType.NONE;
   }
 
   visitBlockStmt(stmt: Stmt.Block) {
@@ -40,7 +46,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     this.declare(stmt.name);
     this.define(stmt.name);
 
-    this.resolveFunction(stmt);
+    this.resolveFunction(stmt, FunctionType.FUNCTION);
   }
 
   visitIfStmt(stmt: Stmt.If) {
@@ -56,6 +62,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   }
 
   visitReturnStmt(stmt: Stmt.Return) {
+    if (this.currentFunction === FunctionType.NONE) {
+      Lox.errorAtToken(stmt.keyword, 'Cannot return from top-level code.');
+    }
+
     if (stmt.value) {
       this.resolve(stmt.value);
     }
@@ -124,7 +134,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
   }
 
-  private resolveFunction(fn: Stmt.Function) {
+  private resolveFunction(fn: Stmt.Function, type: FunctionType) {
+    const enclosingFunction = this.currentFunction;
+    this.currentFunction = type;
+
     this.beginScope();
     for (const param of fn.params) {
       this.declare(param);
@@ -132,6 +145,8 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
     this.resolve(...fn.body);
     this.endScope();
+
+    this.currentFunction = enclosingFunction;
   }
 
   private beginScope() {
