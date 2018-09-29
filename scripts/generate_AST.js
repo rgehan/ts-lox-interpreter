@@ -24,6 +24,7 @@ defineAST(
     'Block:      Stmt[] statements',
     'Expression: Expr expression',
     'If:         Expr condition, Stmt thenBranch, Stmt elseBranch',
+    'While:      Expr condition, Stmt body',
     'Print:      Expr expression',
     'Var:        Token name, Expr initializer',
   ],

@@ -1,0 +1,5 @@
+var i = 0;
+while (i < 10) {
+  print "Counter value: " + i;
+  i = i + 1;
+}

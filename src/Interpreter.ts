@@ -38,6 +38,12 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
   }
 
+  visitWhileStmt(stmt: Stmt.While) {
+    while (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.body);
+    }
+  }
+
   visitPrintStmt(stmt: Stmt.Print) {
     const value = this.evaluate(stmt.expression);
     console.log(this.stringify(value));
