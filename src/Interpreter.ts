@@ -14,10 +14,12 @@ import { Continue } from './Continue';
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
   environment: Environment;
+  locals: Map<Expr.Expr, number>;
 
   constructor() {
     this.globals = new Environment();
     this.environment = this.globals;
+    this.locals = new Map();
 
     // Register all the functions from the standard library as globals
     for (const functionName in StdLib) {
@@ -114,8 +116,14 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitAssignExpr(expr: Expr.Assign): any {
     const value = this.evaluate(expr.value);
+    const distance = this.locals.get(expr);
 
-    this.environment.assign(expr.name, value);
+    if (distance === undefined) {
+      this.globals.assign(expr.name, value);
+    } else {
+      this.environment.assignAt(distance, expr.name, value);
+    }
+
     return value;
   }
 
@@ -245,7 +253,17 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitVariableExpr(expr: Expr.Variable): any {
-    return this.environment.get(expr.name);
+    return this.lookupVariable(expr.name, expr);
+  }
+
+  private lookupVariable(name: Token, expr: Expr.Expr): any {
+    const distance = this.locals.get(expr);
+
+    if (distance === undefined) {
+      return this.globals.get(name);
+    }
+
+    return this.environment.getAt(distance, name.lexeme);
   }
 
   private checkNumberOperand(operator: Token, operand: any) {
@@ -279,6 +297,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   private execute(stmt: Stmt.Stmt): void {
     return stmt.accept(this);
+  }
+
+  resolve(expr: Expr.Expr, depth: number) {
+    this.locals.set(expr, depth);
   }
 
   executeBlock(statements: Stmt.Stmt[], environment: Environment) {

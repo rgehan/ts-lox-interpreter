@@ -7,6 +7,7 @@ import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import * as Stmt from './Stmt';
 import { Interpreter, RuntimeError } from './Interpreter';
+import { Resolver } from './Resolver';
 
 export class Lox {
   static hadError: boolean = false;
@@ -24,6 +25,9 @@ export class Lox {
 
     const parser: Parser = new Parser(tokens);
     const statements: Stmt.Stmt[] = parser.parse();
+
+    const resolver: Resolver = new Resolver(Lox.interpreter);
+    resolver.resolve(...statements);
 
     // Do not bother interpreting if an error happened, as it would pollute
     // the console output with native JavaScript errors
