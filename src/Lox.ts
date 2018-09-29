@@ -6,7 +6,6 @@ import { Parser } from './Parser';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import * as Stmt from './Stmt';
-// import { AstPrinter } from './AstPrinter';
 import { Interpreter, RuntimeError } from './Interpreter';
 
 export class Lox {
@@ -31,9 +30,6 @@ export class Lox {
 
     const parser: Parser = new Parser(tokens);
     const statements: Stmt.Stmt[] = parser.parse();
-
-    // console.log('\n## AST:');
-    // console.log(new AstPrinter().print(expression));
 
     Lox.interpreter.interpret(statements);
   }
@@ -61,7 +57,7 @@ export class Lox {
   runPrompt() {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
     Lox.hadError = false;
