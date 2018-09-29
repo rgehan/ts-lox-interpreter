@@ -4,23 +4,30 @@ const path = require('path');
 const fs = require('fs');
 const { chain } = require('lodash');
 
-defineAST('Expr', [
-  'Binary:   Expr left, Token operator, Expr right',
-  'Grouping: Expr expression',
-  'Literal:  Object value',
-  'Unary:    Token operator, Expr right',
-]);
+defineAST(
+  'Expr',
+  [
+    'Binary:   Expr left, Token operator, Expr right',
+    'Grouping: Expr expression',
+    'Literal:  Object value',
+    'Unary:    Token operator, Expr right',
+  ],
+  ['Token']
+);
 
-defineAST('Stmt', [
-  'Expression: Expr expression',
-  'Print: Expr expression',
-]);
+defineAST(
+  'Stmt',
+  ['Expression: Expr expression', 'Print: Expr expression'],
+  ['Expr']
+);
 
-function defineAST(baseName, types) {
+function defineAST(baseName, types, imports) {
   const filepath = path.resolve(__dirname, `../src/${baseName}.ts`);
 
   let content = `
-import { Token } from './Token';
+${imports
+    .map(importName => `import { ${importName} } from './${importName}';`)
+    .join('\n')}
 
 ${defineVisitor(baseName, types)}
 
