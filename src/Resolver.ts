@@ -10,16 +10,22 @@ enum FunctionType {
   NONE,
   FUNCTION,
 }
+enum LoopType {
+  NONE,
+  LOOP,
+}
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   interpreter: Interpreter;
   scopes: Stack<Scope>;
   currentFunction: FunctionType;
+  currentLoop: LoopType;
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
     this.scopes = new Stack();
     this.currentFunction = FunctionType.NONE;
+    this.currentLoop = LoopType.NONE;
   }
 
   visitBlockStmt(stmt: Stmt.Block) {
@@ -72,13 +78,29 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   }
 
   visitWhileStmt(stmt: Stmt.While) {
+    const enclosingLoop = this.currentLoop;
+    this.currentLoop = LoopType.LOOP;
+
     this.resolve(stmt.condition);
     this.resolve(stmt.body);
+
+    this.currentLoop = enclosingLoop;
   }
 
-  visitBreakStmt(stmt: Stmt.Break) {}
+  visitBreakStmt(stmt: Stmt.Break) {
+    if (this.currentLoop === LoopType.NONE) {
+      Lox.errorAtToken(stmt.keyword, 'Cannot use "break" outside of a loop.');
+    }
+  }
 
-  visitContinueStmt(stmt: Stmt.Continue) {}
+  visitContinueStmt(stmt: Stmt.Continue) {
+    if (this.currentLoop === LoopType.NONE) {
+      Lox.errorAtToken(
+        stmt.keyword,
+        'Cannot use "continue" outside of a loop.'
+      );
+    }
+  }
 
   visitVariableExpr(expr: Expr.Variable) {
     if (
