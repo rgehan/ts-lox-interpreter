@@ -18,15 +18,28 @@ export class Lox {
    * Run some Lox source
    * @param source Lox source code
    */
-  run(source: string) {
+  run(source: string, coerceSingleExpressionToStatement: boolean = false) {
     const scanner: Scanner = new Scanner(source);
     const tokens: Token[] = scanner.scanTokens();
 
     const parser: Parser = new Parser(tokens);
     const statements: Stmt.Stmt[] = parser.parse();
 
-    if (Lox.hadError || Lox.hadRuntimeError) {
+    // Do not bother interpreting if an error happened, as it would pollute
+    // the console output with native JavaScript errors
+    if (Lox.hadError) {
       return;
+    }
+
+    // If there is only a single statement, and it's an expression statement,
+    // we'll treat it as if it was a print statement.
+    if (
+      coerceSingleExpressionToStatement &&
+      statements.length === 1 &&
+      statements[0] instanceof Stmt.Expression
+    ) {
+      const expression = (statements[0] as Stmt.Expression).expression;
+      statements[0] = new Stmt.Print(expression);
     }
 
     Lox.interpreter.interpret(statements);
@@ -68,7 +81,7 @@ export class Lox {
         return;
       }
 
-      this.run(snippet);
+      this.run(snippet, true);
       this.runPrompt();
     });
   }
