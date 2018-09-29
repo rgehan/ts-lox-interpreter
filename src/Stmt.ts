@@ -4,6 +4,7 @@ import { Token } from './Token';
 export interface Visitor<T> {
   visitBlockStmt(stmt: Block): T;
   visitExpressionStmt(stmt: Expression): T;
+  visitIfStmt(stmt: If): T;
   visitPrintStmt(stmt: Print): T;
   visitVarStmt(stmt: Var): T;
 }
@@ -35,6 +36,23 @@ export class Expression extends Stmt {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitExpressionStmt(this);
+  }
+}
+
+export class If extends Stmt {
+  condition: Expr;
+  thenBranch: Stmt;
+  elseBranch: Stmt;
+
+  constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt) {
+    super();
+    this.condition = condition;
+    this.thenBranch = thenBranch;
+    this.elseBranch = elseBranch;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitIfStmt(this);
   }
 }
 

@@ -8,8 +8,9 @@ import * as Stmt from './Stmt';
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement      → exprStmt | printStmt | block ;
+ * statement      → exprStmt | ifStmt | printStmt | block ;
  * exprStmt       → expression ";" ;
+ * ifStmt         → "if" "(" expression ")" statement ("else" statement)? ;
  * printStmt      → "print" expression ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → comma ;
@@ -73,15 +74,26 @@ export class Parser {
   }
 
   private statement(): Stmt.Stmt {
-    if (this.match(TT.PRINT)) {
-      return this.printStatement();
-    }
-
-    if (this.match(TT.LEFT_BRACE)) {
-      return new Stmt.Block(this.block());
-    }
+    if (this.match(TT.IF)) return this.ifStatement();
+    if (this.match(TT.PRINT)) return this.printStatement();
+    if (this.match(TT.LEFT_BRACE)) return new Stmt.Block(this.block());
 
     return this.expressionStatement();
+  }
+
+  private ifStatement(): Stmt.Stmt {
+    this.consume(TT.LEFT_PAREN, 'Expect "(" after "if".');
+    const condition: Expr.Expr = this.expression();
+    this.consume(TT.RIGHT_PAREN, 'Expect ")" after if condition.');
+
+    const thenBranch: Stmt.Stmt = this.statement();
+    let elseBranch: Stmt.Stmt = null;
+
+    if (this.match(TT.ELSE)) {
+      elseBranch = this.statement();
+    }
+
+    return new Stmt.If(condition, thenBranch, elseBranch);
   }
 
   private printStatement(): Stmt.Stmt {

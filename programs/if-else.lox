@@ -1,0 +1,19 @@
+var a = 70;
+var b = 10;
+
+if (a > 10) {
+  print "variable > 10";
+} else if (a == 10) {
+  print "variable = 10";
+} else {
+  print "variable <= 10";
+}
+
+
+if (b > 10) {
+  print "variable > 10";
+} else if (b == 10) {
+  print "variable = 10";
+} else {
+  print "variable <= 10";
+}

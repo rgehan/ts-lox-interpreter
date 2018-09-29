@@ -30,6 +30,14 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     this.evaluate(stmt.expression);
   }
 
+  visitIfStmt(stmt: Stmt.If) {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else {
+      this.execute(stmt.elseBranch);
+    }
+  }
+
   visitPrintStmt(stmt: Stmt.Print) {
     const value = this.evaluate(stmt.expression);
     console.log(this.stringify(value));
