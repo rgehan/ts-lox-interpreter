@@ -49,10 +49,12 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {
-    this.declare(stmt.name);
-    this.define(stmt.name);
+    const fnExpr = stmt.expression as Expr.Function;
 
-    this.resolveFunction(stmt, FunctionType.FUNCTION);
+    this.declare(fnExpr.name);
+    this.define(fnExpr.name);
+
+    this.resolveFunction(fnExpr, FunctionType.FUNCTION);
   }
 
   visitIfStmt(stmt: Stmt.If) {
@@ -116,6 +118,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     this.resolveLocal(expr, expr.name);
   }
 
+  visitFunctionExpr(expr: Expr.Function) {
+    this.resolveFunction(expr, FunctionType.FUNCTION);
+  }
+
   visitAssignExpr(expr: Expr.Assign) {
     this.resolve(expr.value);
     this.resolveLocal(expr, expr.name);
@@ -156,7 +162,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
   }
 
-  private resolveFunction(fn: Stmt.Function, type: FunctionType) {
+  private resolveFunction(fn: Expr.Function, type: FunctionType) {
     const enclosingFunction = this.currentFunction;
     this.currentFunction = type;
 

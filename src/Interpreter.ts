@@ -50,8 +50,11 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {
-    const fn: LoxFunction = new LoxFunction(stmt, this.environment);
-    this.environment.define(stmt.name.lexeme, fn);
+    const fnExpr = stmt.expression as Expr.Function;
+    this.environment.define(
+      fnExpr.name.lexeme,
+      new LoxFunction(fnExpr, this.environment)
+    );
   }
 
   visitIfStmt(stmt: Stmt.If) {
@@ -129,6 +132,11 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitGroupingExpr(expr: Expr.Grouping): any {
     return this.evaluate(expr.expression);
+  }
+
+  visitFunctionExpr(expr: Expr.Function): any {
+    const fn: LoxFunction = new LoxFunction(expr, this.environment);
+    return fn;
   }
 
   visitLiteralExpr(expr: Expr.Literal): any {

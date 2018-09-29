@@ -1,10 +1,12 @@
 import { Token } from './Token';
+import { Stmt } from './Stmt';
 
 export interface Visitor<T> {
   visitAssignExpr(expr: Assign): T;
   visitBinaryExpr(expr: Binary): T;
   visitCallExpr(expr: Call): T;
   visitGroupingExpr(expr: Grouping): T;
+  visitFunctionExpr(expr: Function): T;
   visitLiteralExpr(expr: Literal): T;
   visitLogicalExpr(expr: Logical): T;
   visitUnaryExpr(expr: Unary): T;
@@ -74,6 +76,25 @@ export class Grouping extends Expr {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitGroupingExpr(this);
+  }
+}
+
+export class Function extends Expr {
+  keyword: Token;
+  name: Token;
+  params: Token[];
+  body: Stmt[];
+
+  constructor(keyword: Token, name: Token, params: Token[], body: Stmt[]) {
+    super();
+    this.keyword = keyword;
+    this.name = name;
+    this.params = params;
+    this.body = body;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitFunctionExpr(this);
   }
 }
 

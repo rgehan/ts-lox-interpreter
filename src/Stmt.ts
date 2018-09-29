@@ -71,15 +71,11 @@ export class Expression extends Stmt {
 }
 
 export class Function extends Stmt {
-  name: Token;
-  params: Token[];
-  body: Stmt[];
+  expression: Expr;
 
-  constructor(name: Token, params: Token[], body: Stmt[]) {
+  constructor(expression: Expr) {
     super();
-    this.name = name;
-    this.params = params;
-    this.body = body;
+    this.expression = expression;
   }
 
   accept<T>(visitor: Visitor<T>): T {

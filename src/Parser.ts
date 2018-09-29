@@ -9,7 +9,8 @@ import * as Stmt from './Stmt';
  * declaration    → funDecl
  *                | varDecl
  *                | statement
- * funDecl        → "fun" IDENTIFIER "(" parameters? ")" block ;
+ * funDecl        → "fun" function
+ * function       → IDENTIFIER? "(" parameters? ")" block ;
  * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * statement      → exprStmt
@@ -32,8 +33,7 @@ import * as Stmt from './Stmt';
  * breakStmt      → "break" ";" ;
  * continueStmt   → "continue" ";" ;
  * block          → "{" declaration* "}" ;
- * expression     → comma ;
- * comma          → assignment ( "," equality)* ;
+ * expression     → assignment ;
  * assignment     → IDENTIFIER "=" assignment
  *                | logic_or ;
  * logic_or       → logic_and ( "or" logic_and )* ;
@@ -51,6 +51,7 @@ import * as Stmt from './Stmt';
  * primary        → "false" | "true" | "nil" | "this"
  *                | NUMBER | STRING
  *                | "(" expression ")"
+ *                | function
  *                | IDENTIFIER;
  */
 
@@ -76,7 +77,7 @@ export class Parser {
 
   private declaration(): Stmt.Stmt {
     try {
-      if (this.match(TT.FUN)) return this.function('function');
+      if (this.match(TT.FUN)) return this.functionDeclaration('function');
       if (this.match(TT.VAR)) return this.varDeclaration();
 
       return this.statement();
@@ -215,9 +216,28 @@ export class Parser {
     return new Stmt.Expression(expr);
   }
 
-  private function(kind: string): Stmt.Function {
-    const name: Token = this.consume(TT.IDENTIFIER, `Expect ${kind} name.`);
-    this.consume(TT.LEFT_PAREN, `Expect "(" after ${kind} name.`);
+  private functionDeclaration(kind: string): Stmt.Function {
+    const expr = this.function('function');
+    if (expr.name === null) {
+      Lox.errorAtToken(expr.keyword, `Expect ${kind} name.`);
+    }
+    return new Stmt.Function(expr);
+  }
+
+  private function(kind: string): Expr.Function {
+    const keyword = this.previous();
+
+    let name: Token = null;
+    if (this.match(TT.IDENTIFIER)) {
+      name = this.previous();
+    }
+
+    this.consume(
+      TT.LEFT_PAREN,
+      name
+        ? `Expect "(" after ${kind} name.`
+        : `Expect "(" after function keyword`
+    );
 
     const parameters: Token[] = [];
     if (!this.check(TT.RIGHT_PAREN)) {
@@ -235,7 +255,7 @@ export class Parser {
 
     const body: Stmt.Stmt[] = this.block();
 
-    return new Stmt.Function(name, parameters, body);
+    return new Expr.Function(keyword, name, parameters, body);
   }
 
   private block(): Stmt.Stmt[] {
@@ -250,19 +270,7 @@ export class Parser {
   }
 
   private expression(): Expr.Expr {
-    return this.comma();
-  }
-
-  private comma(): Expr.Expr {
-    let expr: Expr.Expr = this.assignment();
-
-    while (this.match(TT.COMMA)) {
-      const operator: Token = this.previous();
-      const right: Expr.Expr = this.assignment();
-      expr = new Expr.Binary(expr, operator, right);
-    }
-
-    return expr;
+    return this.assignment();
   }
 
   private assignment(): Expr.Expr {
@@ -436,6 +444,10 @@ export class Parser {
 
     if (this.match(TT.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
+    }
+
+    if (this.match(TT.FUN)) {
+      return this.function('lambda');
     }
 
     if (this.match(TT.LEFT_PAREN)) {

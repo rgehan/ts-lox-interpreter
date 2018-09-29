@@ -1,0 +1,9 @@
+fun runManyTimes(count, fn) {
+  for (var i = 0; i < count; i = i + 1) {
+    fn(i);
+  }
+}
+
+runManyTimes(4, fun (n) {
+  print "N=" + n;
+});

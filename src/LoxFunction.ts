@@ -1,14 +1,14 @@
 import { LoxCallable } from './LoxCallable';
-import * as Stmt from './Stmt';
+import * as Expr from './Expr';
 import { Interpreter } from './Interpreter';
 import { Environment } from './Environment';
 import { Return } from './Return';
 
 export class LoxFunction extends LoxCallable {
-  declaration: Stmt.Function;
+  declaration: Expr.Function;
   closure: Environment;
 
-  constructor(declaration: Stmt.Function, closure: Environment) {
+  constructor(declaration: Expr.Function, closure: Environment) {
     super();
     this.declaration = declaration;
     this.closure = closure;

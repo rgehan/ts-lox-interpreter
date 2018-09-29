@@ -11,12 +11,13 @@ defineAST(
     'Binary:   Expr left, Token operator, Expr right',
     'Call:     Expr callee, Token paren, Expr[] args',
     'Grouping: Expr expression',
+    'Function: Token keyword, Token name, Token[] params, Stmt[] body',
     'Literal:  Object value',
     'Logical:  Expr left, Token operator, Expr right',
     'Unary:    Token operator, Expr right',
     'Variable: Token name',
   ],
-  ['Token']
+  ['Token', 'Stmt']
 );
 
 defineAST(
@@ -26,7 +27,7 @@ defineAST(
     'Break:      Token keyword',
     'Continue:   Token keyword',
     'Expression: Expr expression',
-    'Function:   Token name, Token[] params, Stmt[] body',
+    'Function:   Expr expression',
     'If:         Expr condition, Stmt thenBranch, Stmt elseBranch',
     'While:      Expr condition, Stmt body',
     'Print:      Expr expression',
