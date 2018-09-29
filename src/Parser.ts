@@ -8,9 +8,10 @@ import * as Stmt from './Stmt';
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement      → exprStmt | printStmt ;
+ * statement      → exprStmt | printStmt | block ;
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
+ * block          → "{" declaration* "}" ;
  * expression     → comma ;
  * comma          → assignment ( "," equality)* ;
  * assignment     → IDENTIFIER "=" assignment | equality ;
@@ -76,6 +77,10 @@ export class Parser {
       return this.printStatement();
     }
 
+    if (this.match(TT.LEFT_BRACE)) {
+      return new Stmt.Block(this.block());
+    }
+
     return this.expressionStatement();
   }
 
@@ -89,6 +94,17 @@ export class Parser {
     const expr: Expr.Expr = this.expression();
     this.consume(TT.SEMICOLON, 'Expect ";" after value.');
     return new Stmt.Expression(expr);
+  }
+
+  private block(): Stmt.Stmt[] {
+    const statements: Stmt.Stmt[] = [];
+
+    while (!this.check(TT.RIGHT_BRACE) && !this.isAtEnd()) {
+      statements.push(this.declaration());
+    }
+
+    this.consume(TT.RIGHT_BRACE, 'Expect "}" after block.');
+    return statements;
   }
 
   private expression(): Expr.Expr {

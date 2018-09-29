@@ -22,6 +22,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
   }
 
+  visitBlockStmt(stmt: Stmt.Block) {
+    this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+
   visitExpressionStmt(stmt: Stmt.Expression) {
     this.evaluate(stmt.expression);
   }
@@ -159,6 +163,17 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   private execute(stmt: Stmt.Stmt): void {
     return stmt.accept(this);
+  }
+
+  private executeBlock(statements: Stmt.Stmt[], environment: Environment) {
+    const previous: Environment = this.environment;
+
+    try {
+      this.environment = environment;
+      statements.forEach(statement => this.execute(statement));
+    } finally {
+      this.environment = previous;
+    }
   }
 
   private stringify(object: any): string {
