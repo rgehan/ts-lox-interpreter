@@ -33,6 +33,8 @@ export class LoxFunction extends LoxCallable {
       if (error instanceof Return) {
         return error.value;
       }
+
+      throw error;
     }
 
     return null;

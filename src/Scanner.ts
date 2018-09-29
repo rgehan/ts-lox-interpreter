@@ -20,6 +20,7 @@ const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
 
 const KEYWORDS: { [k: string]: TT } = {
   and: TT.AND,
+  break: TT.BREAK,
   class: TT.CLASS,
   else: TT.ELSE,
   false: TT.FALSE,

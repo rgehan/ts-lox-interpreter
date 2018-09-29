@@ -3,6 +3,7 @@ import { Token } from './Token';
 
 export interface Visitor<T> {
   visitBlockStmt(stmt: Block): T;
+  visitBreakStmt(stmt: Break): T;
   visitExpressionStmt(stmt: Expression): T;
   visitFunctionStmt(stmt: Function): T;
   visitIfStmt(stmt: If): T;
@@ -26,6 +27,19 @@ export class Block extends Stmt {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitBlockStmt(this);
+  }
+}
+
+export class Break extends Stmt {
+  keyword: Token;
+
+  constructor(keyword: Token) {
+    super();
+    this.keyword = keyword;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitBreakStmt(this);
   }
 }
 

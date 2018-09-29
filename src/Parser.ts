@@ -17,6 +17,7 @@ import * as Stmt from './Stmt';
  *                | ifStmt
  *                | printStmt
  *                | returnStmt
+ *                | breakStmt
  *                | whileStmt
  *                | block ;
  * exprStmt       → expression ";" ;
@@ -27,6 +28,7 @@ import * as Stmt from './Stmt';
  * whileStmt      → "while" "(" expression ")" statement ;
  * printStmt      → "print" expression ";" ;
  * returnStmt     → "return" expression? ";" ;
+ * breakStmt     → "break" ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → comma ;
  * comma          → assignment ( "," equality)* ;
@@ -100,6 +102,7 @@ export class Parser {
     if (this.match(TT.WHILE)) return this.whileStatement();
     if (this.match(TT.PRINT)) return this.printStatement();
     if (this.match(TT.RETURN)) return this.returnStatement();
+    if (this.match(TT.BREAK)) return this.breakStatement();
     if (this.match(TT.LEFT_BRACE)) return new Stmt.Block(this.block());
 
     return this.expressionStatement();
@@ -189,6 +192,12 @@ export class Parser {
     this.consume(TT.SEMICOLON, 'Expect ";" after return value.');
 
     return new Stmt.Return(keyword, value);
+  }
+
+  private breakStatement(): Stmt.Stmt {
+    const keyword: Token = this.previous();
+    this.consume(TT.SEMICOLON, 'Expect ";" after return value.');
+    return new Stmt.Break(keyword);
   }
 
   private expressionStatement(): Stmt.Stmt {

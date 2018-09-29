@@ -8,6 +8,7 @@ import { LoxCallable } from './LoxCallable';
 import StdLib from './stdlib';
 import { LoxFunction } from './LoxFunction';
 import { Return } from './Return';
+import { Break } from './Break';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
@@ -60,7 +61,16 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitWhileStmt(stmt: Stmt.While) {
     while (this.isTruthy(this.evaluate(stmt.condition))) {
-      this.execute(stmt.body);
+      try {
+        this.execute(stmt.body);
+      } catch (error) {
+        if (error instanceof Break) {
+          break;
+        }
+
+        // If this error is not due to a "break;", rethrow
+        throw error;
+      }
     }
   }
 
@@ -77,6 +87,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
 
     throw new Return(value);
+  }
+
+  visitBreakStmt(stmt: Stmt.Break) {
+    throw new Break();
   }
 
   visitVarStmt(stmt: Stmt.Var) {
