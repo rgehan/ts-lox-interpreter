@@ -148,6 +148,14 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     const scope = this.scopes.peek();
+
+    if (scope.has(name.lexeme)) {
+      Lox.errorAtToken(
+        name,
+        'Variable with this name is already declared in this scope.'
+      );
+    }
+
     scope.set(name.lexeme, false);
   }
 
