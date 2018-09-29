@@ -6,6 +6,7 @@ export enum TokenType {
   RIGHT_BRACE = 'RIGHT_BRACE',
   COMMA = 'COMMA',
   DOT = 'DOT',
+  HAT = 'HAT',
   MINUS = 'MINUS',
   PERCENT = 'PERCENT',
   PLUS = 'PLUS',

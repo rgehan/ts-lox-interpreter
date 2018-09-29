@@ -15,6 +15,7 @@ const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
   ';': TT.SEMICOLON,
   '*': TT.STAR,
   '%': TT.PERCENT,
+  '^': TT.HAT,
 };
 
 const KEYWORDS: { [k: string]: TT } = {
