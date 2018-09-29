@@ -11,7 +11,11 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
         this.execute(statement);
       });
     } catch (error) {
-      Lox.runtimeError(error);
+      if (error.name === 'RuntimeError') {
+        Lox.runtimeError(error);
+      } else {
+        console.log('Generic error. ', error);
+      }
     }
   }
 

@@ -92,7 +92,7 @@ export class Lox {
   }
 
   static runtimeError(error: RuntimeError) {
-    console.error(`${error.message}\n[line ${error.token.line}]`);
+    console.error(`[line ${error.token.line}] ${error.message}`);
     Lox.hadRuntimeError = true;
   }
 }
