@@ -9,11 +9,15 @@ import * as Stmt from './Stmt';
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * statement      → exprStmt
+ *                | forStmt
  *                | ifStmt
- *                | whileStmt
  *                | printStmt
+ *                | whileStmt
  *                | block ;
  * exprStmt       → expression ";" ;
+ * forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+ *                            expression? ";"
+ *                            expression? ")" statement ;
  * ifStmt         → "if" "(" expression ")" statement ("else" statement)? ;
  * whileStmt      → "while" "(" expression ")" statement ;
  * printStmt      → "print" expression ";" ;
@@ -84,12 +88,56 @@ export class Parser {
   }
 
   private statement(): Stmt.Stmt {
+    if (this.match(TT.FOR)) return this.forStatement();
     if (this.match(TT.IF)) return this.ifStatement();
     if (this.match(TT.WHILE)) return this.whileStatement();
     if (this.match(TT.PRINT)) return this.printStatement();
     if (this.match(TT.LEFT_BRACE)) return new Stmt.Block(this.block());
 
     return this.expressionStatement();
+  }
+
+  private forStatement(): Stmt.Stmt {
+    this.consume(TT.LEFT_PAREN, 'Expect "(" after "for".');
+
+    let initializer: Stmt.Stmt = null;
+    if (this.match(TT.SEMICOLON)) {
+      initializer = null;
+    } else if (this.match(TT.VAR)) {
+      initializer = this.varDeclaration();
+    } else {
+      initializer = this.expressionStatement();
+    }
+
+    let condition: Expr.Expr = new Expr.Literal(true);
+    if (!this.check(TT.SEMICOLON)) {
+      condition = this.expression();
+    }
+    this.consume(TT.SEMICOLON, 'Expect ";" after loop condition.');
+
+    let increment: Expr.Expr = null;
+    if (!this.check(TT.RIGHT_PAREN)) {
+      increment = this.expression();
+    }
+    this.consume(TT.RIGHT_PAREN, 'Expect ")" after for clauses.');
+
+    let body: Stmt.Stmt = this.statement();
+
+    /*
+     * Desugaring the for loop in a while loop
+     */
+
+    if (increment) {
+      body = new Stmt.Block([body, new Stmt.Expression(increment)]);
+    }
+
+    body = new Stmt.While(condition, body);
+
+    if (initializer) {
+      body = new Stmt.Block([initializer, body]);
+    }
+
+    return body;
   }
 
   private ifStatement(): Stmt.Stmt {
