@@ -118,6 +118,9 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
       case TT.MINUS:
         this.checkNumberOperands(expr.operator, left, right);
         return Number(left) - Number(right);
+      case TT.PERCENT:
+        this.checkNumberOperands(expr.operator, left, right);
+        return Number(left) % Number(right);
       case TT.PLUS:
         if (typeof left === 'string' || typeof right === 'string') {
           return `${left}${right}`;

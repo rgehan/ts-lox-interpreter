@@ -7,6 +7,7 @@ export enum TokenType {
   COMMA = 'COMMA',
   DOT = 'DOT',
   MINUS = 'MINUS',
+  PERCENT = 'PERCENT',
   PLUS = 'PLUS',
   SEMICOLON = 'SEMICOLON',
   SLASH = 'SLASH',

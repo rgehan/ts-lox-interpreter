@@ -25,7 +25,8 @@ import * as Stmt from './Stmt';
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
  * addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
- * multiplication → unary ( ( "/" | "*" ) unary )* ;
+ * multiplication → modulo ( ( "/" | "*" ) modulo )* ;
+ * modulo         → unary ( "%" unary )* ; 
  * unary          → ( "!" | "-" ) unary
  *                | primary ;
  * primary        → "false" | "true" | "nil" | "this"
@@ -220,9 +221,21 @@ export class Parser {
   }
 
   private multiplication(): Expr.Expr {
-    let expr: Expr.Expr = this.unary();
+    let expr: Expr.Expr = this.modulo();
 
     while (this.match(TT.SLASH, TT.STAR)) {
+      const operator: Token = this.previous();
+      const right: Expr.Expr = this.modulo();
+      expr = new Expr.Binary(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private modulo(): Expr.Expr {
+    let expr: Expr.Expr = this.unary();
+
+    while (this.match(TT.PERCENT)) {
       const operator: Token = this.previous();
       const right: Expr.Expr = this.unary();
       expr = new Expr.Binary(expr, operator, right);
