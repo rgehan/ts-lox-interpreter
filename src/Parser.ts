@@ -12,7 +12,8 @@ import * as Stmt from './Stmt';
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
  * expression     → block ;
- * block          → equality ( "," equality)* ;
+ * block          → assignment ( "," equality)* ;
+ * assignment     → IDENTIFIER "=" assignment | equality ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
  * addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -95,12 +96,30 @@ export class Parser {
   }
 
   private block(): Expr.Expr {
-    let expr: Expr.Expr = this.equality();
+    let expr: Expr.Expr = this.assignment();
 
     while (this.match(TT.COMMA)) {
       const operator: Token = this.previous();
-      const right: Expr.Expr = this.equality();
+      const right: Expr.Expr = this.assignment();
       expr = new Expr.Binary(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private assignment(): Expr.Expr {
+    const expr: Expr.Expr = this.equality();
+
+    if (this.match(TT.EQUAL)) {
+      const equals: Token = this.previous();
+      const value: Expr.Expr = this.assignment();
+
+      if (expr instanceof Expr.Variable) {
+        const name: Token = (expr as Expr.Variable).name;
+        return new Expr.Assign(name, value);
+      }
+
+      this.error(equals, 'Invalid assignment target.');
     }
 
     return expr;

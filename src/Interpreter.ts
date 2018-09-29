@@ -34,11 +34,18 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   visitVarStmt(stmt: Stmt.Var) {
     let value: any = null;
 
-    if (stmt.initializer !== null) {
+    if (stmt.initializer) {
       value = this.evaluate(stmt.initializer);
     }
 
     this.environment.define(stmt.name.lexeme, value);
+  }
+
+  visitAssignExpr(expr: Expr.Assign): any {
+    const value = this.evaluate(expr.value);
+
+    this.environment.assign(expr.name, value);
+    return value;
   }
 
   visitGroupingExpr(expr: Expr.Grouping): any {

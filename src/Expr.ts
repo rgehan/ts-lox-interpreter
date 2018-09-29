@@ -1,6 +1,7 @@
 import { Token } from './Token';
 
 export interface Visitor<T> {
+  visitAssignExpr(expr: Assign): T;
   visitBinaryExpr(expr: Binary): T;
   visitGroupingExpr(expr: Grouping): T;
   visitLiteralExpr(expr: Literal): T;
@@ -10,6 +11,21 @@ export interface Visitor<T> {
 
 export abstract class Expr {
   abstract accept<T>(visitor: Visitor<T>): T;
+}
+
+export class Assign extends Expr {
+  name: Token;
+  value: Expr;
+
+  constructor(name: Token, value: Expr) {
+    super();
+    this.name = name;
+    this.value = value;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitAssignExpr(this);
+  }
 }
 
 export class Binary extends Expr {

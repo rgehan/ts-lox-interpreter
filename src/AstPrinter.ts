@@ -5,6 +5,10 @@ export class AstPrinter implements Expr.Visitor<string> {
     return expr.accept(this);
   }
 
+  visitAssignExpr(expr: Expr.Assign): string {
+    return ''; // TODO
+  }
+
   visitBinaryExpr(expr: Expr.Binary): string {
     return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
   }
