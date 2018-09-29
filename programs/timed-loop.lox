@@ -1,0 +1,14 @@
+var start = clock();
+
+print "Starting...";
+
+var continue = true;
+while (continue) {
+  var now = clock();
+
+  if ((now - start) > 1000) {
+    continue = false;
+  }
+}
+
+print "Stopped.";

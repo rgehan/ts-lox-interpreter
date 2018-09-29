@@ -4,9 +4,22 @@ import * as Stmt from './Stmt';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import { Environment } from './Environment';
+import { LoxCallable } from './LoxCallable';
+import StdLib from './stdlib';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
-  environment: Environment = new Environment();
+  globals: Environment;
+  environment: Environment;
+
+  constructor() {
+    this.globals = new Environment();
+    this.environment = this.globals;
+
+    // Register all the functions from the standard library as globals
+    for (const functionName in StdLib) {
+      this.globals.define(functionName, StdLib[functionName]);
+    }
+  }
 
   interpret(statements: Stmt.Stmt[]) {
     try {
@@ -33,7 +46,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   visitIfStmt(stmt: Stmt.If) {
     if (this.isTruthy(this.evaluate(stmt.condition))) {
       this.execute(stmt.thenBranch);
-    } else {
+    } else if (stmt.elseBranch !== null) {
       this.execute(stmt.elseBranch);
     }
   }
@@ -146,6 +159,36 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
       case TT.COMMA:
         return right;
     }
+  }
+
+  visitCallExpr(expr: Expr.Call): any {
+    const callee = this.evaluate(expr.callee);
+
+    // Throw if the "callee" is not callable
+    if (!(callee instanceof LoxCallable)) {
+      throw new RuntimeError(
+        expr.paren,
+        'Can only call functions and classes.'
+      );
+    }
+
+    // Extract the arguments of the call
+    const args: any[] = [];
+    for (const arg of expr.args) {
+      args.push(this.evaluate(arg));
+    }
+
+    const fn: LoxCallable = callee as LoxCallable;
+
+    // Check the number of arguments is compatible with the function's arity
+    if (args.length !== fn.arity()) {
+      throw new RuntimeError(
+        expr.paren,
+        `Expected ${fn.arity()} arguments, but got ${args.length}.`
+      );
+    }
+
+    return fn.call(this, args);
   }
 
   visitLogicalExpr(expr: Expr.Logical): any {

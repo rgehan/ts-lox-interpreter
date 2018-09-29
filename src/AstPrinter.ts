@@ -37,6 +37,10 @@ export class AstPrinter implements Expr.Visitor<string> {
     return ''; // TODO;
   }
 
+  visitCallExpr(expr: Expr.Call): string {
+    return ''; // TODO
+  }
+
   private parenthesize(name: string, ...exprs: Expr.Expr[]): string {
     const exprStrings = exprs.map(expr => ' ' + expr.accept(this));
     return `(${name}${exprStrings})`;

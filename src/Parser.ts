@@ -35,7 +35,9 @@ import * as Stmt from './Stmt';
  * modulo         → exponent ( "%" exponent )* ;
  * exponent       → unary ( "^" unary )* ;
  * unary          → ( "!" | "-" ) unary
- *                | primary ;
+ *                | call ;
+ * call           → primary ( "(" arguments? ")" )* ;
+ * arguments      → expression ( "," expression )* ;
  * primary        → "false" | "true" | "nil" | "this"
  *                | NUMBER | STRING
  *                | "(" expression ")"
@@ -324,7 +326,43 @@ export class Parser {
       return new Expr.Unary(operator, right);
     }
 
-    return this.primary();
+    return this.call();
+  }
+
+  private call(): Expr.Expr {
+    let expr: Expr.Expr = this.primary();
+
+    while (true) {
+      if (this.match(TT.LEFT_PAREN)) {
+        expr = this.finishCall(expr);
+      } else {
+        break;
+      }
+    }
+
+    return expr;
+  }
+
+  private finishCall(callee: Expr.Expr): Expr.Expr {
+    const args: Expr.Expr[] = [];
+
+    // If there are arguments to extract...
+    if (!this.check(TT.RIGHT_PAREN)) {
+      do {
+        if (args.length >= 8) {
+          this.error(this.peek(), 'Cannot have more than 8 arguments.');
+        }
+
+        args.push(this.expression());
+      } while (this.match(TT.COMMA));
+    }
+
+    const paren: Token = this.consume(
+      TT.RIGHT_PAREN,
+      'Expect ")" after arguments.'
+    );
+
+    return new Expr.Call(callee, paren, args);
   }
 
   private primary(): Expr.Expr {
