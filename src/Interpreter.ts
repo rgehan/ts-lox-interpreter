@@ -6,6 +6,7 @@ import { TokenType as TT } from './TokenType';
 import { Environment } from './Environment';
 import { LoxCallable } from './LoxCallable';
 import StdLib from './stdlib';
+import { LoxFunction } from './LoxFunction';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
@@ -41,6 +42,11 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitExpressionStmt(stmt: Stmt.Expression) {
     this.evaluate(stmt.expression);
+  }
+
+  visitFunctionStmt(stmt: Stmt.Function) {
+    const fn: LoxFunction = new LoxFunction(stmt);
+    this.environment.define(stmt.name.lexeme, fn);
   }
 
   visitIfStmt(stmt: Stmt.If) {
@@ -241,7 +247,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     return stmt.accept(this);
   }
 
-  private executeBlock(statements: Stmt.Stmt[], environment: Environment) {
+  executeBlock(statements: Stmt.Stmt[], environment: Environment) {
     const previous: Environment = this.environment;
 
     try {

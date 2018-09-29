@@ -6,7 +6,11 @@ import * as Stmt from './Stmt';
 
 /*
  * program        → declaration* EOF ;
- * declaration    → varDecl | statement ;
+ * declaration    → funDecl
+ *                | varDecl
+ *                | statement
+ * funDecl        → "fun" IDENTIFIER "(" parameters? ")" block ;
+ * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * statement      → exprStmt
  *                | forStmt
@@ -66,9 +70,8 @@ export class Parser {
 
   private declaration(): Stmt.Stmt {
     try {
-      if (this.match(TT.VAR)) {
-        return this.varDeclaration();
-      }
+      if (this.match(TT.FUN)) return this.function('function');
+      if (this.match(TT.VAR)) return this.varDeclaration();
 
       return this.statement();
     } catch (error) {
@@ -176,6 +179,29 @@ export class Parser {
     const expr: Expr.Expr = this.expression();
     this.consume(TT.SEMICOLON, 'Expect ";" after value.');
     return new Stmt.Expression(expr);
+  }
+
+  private function(kind: string): Stmt.Function {
+    const name: Token = this.consume(TT.IDENTIFIER, `Expect ${kind} name.`);
+    this.consume(TT.LEFT_PAREN, `Expect "(" after ${kind} name.`);
+
+    const parameters: Token[] = [];
+    if (!this.check(TT.RIGHT_PAREN)) {
+      do {
+        if (parameters.length >= 8) {
+          this.error(this.peek(), 'Cannot have more than 8 parameters.');
+        }
+
+        parameters.push(this.consume(TT.IDENTIFIER, 'Expect parameter name.'));
+      } while (this.match(TT.COMMA));
+    }
+
+    this.consume(TT.RIGHT_PAREN, 'Expect ")" after parameters.');
+    this.consume(TT.LEFT_BRACE, `Expect "{" before ${kind} body.`);
+
+    const body: Stmt.Stmt[] = this.block();
+
+    return new Stmt.Function(name, parameters, body);
   }
 
   private block(): Stmt.Stmt[] {

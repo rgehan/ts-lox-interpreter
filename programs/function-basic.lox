@@ -1,0 +1,6 @@
+fun doubleThenPrint(n) {
+  n = n * 2;
+  print n;
+}
+
+doubleThenPrint(2);

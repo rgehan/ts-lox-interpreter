@@ -5,6 +5,6 @@ export abstract class LoxCallable {
   abstract call(interpreter: Interpreter, args: any[]): any;
 
   toString(): string {
-    return '<native function>';
+    return '<native fn>';
   }
 }
