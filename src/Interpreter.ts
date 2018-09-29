@@ -3,8 +3,11 @@ import * as Expr from './Expr';
 import * as Stmt from './Stmt';
 import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
+import { Environment } from './Environment';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
+  environment: Environment = new Environment();
+
   interpret(statements: Stmt.Stmt[]) {
     try {
       statements.forEach(statement => {
@@ -29,7 +32,13 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitVarStmt(stmt: Stmt.Var) {
-    // TODO
+    let value: any = null;
+
+    if (stmt.initializer !== null) {
+      value = this.evaluate(stmt.initializer);
+    }
+
+    this.environment.define(stmt.name.lexeme, value);
   }
 
   visitGroupingExpr(expr: Expr.Grouping): any {
@@ -109,7 +118,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitVariableExpr(expr: Expr.Variable): any {
-    // TODO
+    return this.environment.get(expr.name);
   }
 
   private checkNumberOperand(operator: Token, operand: any) {
