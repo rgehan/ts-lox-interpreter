@@ -1,7 +1,7 @@
 import { LoxCallable } from '../LoxCallable';
 import { Interpreter } from '../Interpreter';
 
-export default new class extends LoxCallable {
+export const time = new class extends LoxCallable {
   arity() {
     return 0;
   }

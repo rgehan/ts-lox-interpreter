@@ -1,8 +1,8 @@
 import { LoxCallable } from '../LoxCallable';
-import clock from './clock';
+import { time } from './time';
 
 const fns: { [k: string]: LoxCallable } = {
-  clock,
+  time,
 };
 
 export default fns;
