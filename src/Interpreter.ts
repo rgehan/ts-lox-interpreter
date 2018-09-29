@@ -48,7 +48,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {
-    const fn: LoxFunction = new LoxFunction(stmt);
+    const fn: LoxFunction = new LoxFunction(stmt, this.environment);
     this.environment.define(stmt.name.lexeme, fn);
   }
 

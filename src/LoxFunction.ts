@@ -6,10 +6,12 @@ import { Return } from './Return';
 
 export class LoxFunction extends LoxCallable {
   declaration: Stmt.Function;
+  closure: Environment;
 
-  constructor(declaration: Stmt.Function) {
+  constructor(declaration: Stmt.Function, closure: Environment) {
     super();
     this.declaration = declaration;
+    this.closure = closure;
   }
 
   arity() {
@@ -18,7 +20,7 @@ export class LoxFunction extends LoxCallable {
 
   call(interpreter: Interpreter, args: any[]) {
     // Create a fresh scope for the function call
-    const environment = new Environment(interpreter.globals);
+    const environment = new Environment(this.closure);
 
     // "Inject" the parameters values inside the environment
     for (let i = 0; i < this.declaration.params.length; i++) {
