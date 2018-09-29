@@ -1,2 +1,2 @@
-print "hello world...";
-print "...but hello you too";
+var s = "hello world";
+print s;
