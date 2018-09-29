@@ -31,6 +31,10 @@ export class Lox {
     const parser: Parser = new Parser(tokens);
     const statements: Stmt.Stmt[] = parser.parse();
 
+    if (Lox.hadError || Lox.hadRuntimeError) {
+      return;
+    }
+
     Lox.interpreter.interpret(statements);
   }
 
@@ -61,6 +65,7 @@ export class Lox {
     });
 
     Lox.hadError = false;
+    Lox.hadRuntimeError = false;
 
     rl.question('> ', snippet => {
       rl.close();
