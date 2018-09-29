@@ -8,6 +8,7 @@ export interface Visitor<T> {
   visitIfStmt(stmt: If): T;
   visitWhileStmt(stmt: While): T;
   visitPrintStmt(stmt: Print): T;
+  visitReturnStmt(stmt: Return): T;
   visitVarStmt(stmt: Var): T;
 }
 
@@ -100,6 +101,21 @@ export class Print extends Stmt {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitPrintStmt(this);
+  }
+}
+
+export class Return extends Stmt {
+  keyword: Token;
+  value: Expr;
+
+  constructor(keyword: Token, value: Expr) {
+    super();
+    this.keyword = keyword;
+    this.value = value;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitReturnStmt(this);
   }
 }
 

@@ -2,6 +2,7 @@ import { LoxCallable } from './LoxCallable';
 import * as Stmt from './Stmt';
 import { Interpreter } from './Interpreter';
 import { Environment } from './Environment';
+import { Return } from './Return';
 
 export class LoxFunction extends LoxCallable {
   declaration: Stmt.Function;
@@ -26,7 +27,15 @@ export class LoxFunction extends LoxCallable {
     }
 
     // Execute the function's code with the, now, correct data
-    interpreter.executeBlock(this.declaration.body, environment);
+    try {
+      interpreter.executeBlock(this.declaration.body, environment);
+    } catch (error) {
+      if (error instanceof Return) {
+        return error.value;
+      }
+    }
+
+    return null;
   }
 
   toString(): string {

@@ -7,6 +7,7 @@ import { Environment } from './Environment';
 import { LoxCallable } from './LoxCallable';
 import StdLib from './stdlib';
 import { LoxFunction } from './LoxFunction';
+import { Return } from './Return';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
@@ -66,6 +67,16 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   visitPrintStmt(stmt: Stmt.Print) {
     const value = this.evaluate(stmt.expression);
     console.log(this.stringify(value));
+  }
+
+  visitReturnStmt(stmt: Stmt.Return) {
+    let value: any = null;
+
+    if (stmt.value !== null) {
+      value = this.evaluate(stmt.value);
+    }
+
+    throw new Return(value);
   }
 
   visitVarStmt(stmt: Stmt.Var) {

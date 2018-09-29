@@ -16,6 +16,7 @@ import * as Stmt from './Stmt';
  *                | forStmt
  *                | ifStmt
  *                | printStmt
+ *                | returnStmt
  *                | whileStmt
  *                | block ;
  * exprStmt       → expression ";" ;
@@ -25,6 +26,7 @@ import * as Stmt from './Stmt';
  * ifStmt         → "if" "(" expression ")" statement ("else" statement)? ;
  * whileStmt      → "while" "(" expression ")" statement ;
  * printStmt      → "print" expression ";" ;
+ * returnStmt     → "return" expression? ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → comma ;
  * comma          → assignment ( "," equality)* ;
@@ -97,6 +99,7 @@ export class Parser {
     if (this.match(TT.IF)) return this.ifStatement();
     if (this.match(TT.WHILE)) return this.whileStatement();
     if (this.match(TT.PRINT)) return this.printStatement();
+    if (this.match(TT.RETURN)) return this.returnStatement();
     if (this.match(TT.LEFT_BRACE)) return new Stmt.Block(this.block());
 
     return this.expressionStatement();
@@ -173,6 +176,19 @@ export class Parser {
     const value: Expr.Expr = this.expression();
     this.consume(TT.SEMICOLON, 'Expect ";" after value.');
     return new Stmt.Print(value);
+  }
+
+  private returnStatement(): Stmt.Stmt {
+    const keyword: Token = this.previous();
+
+    let value: Expr.Expr;
+    if (!this.check(TT.SEMICOLON)) {
+      value = this.expression();
+    }
+
+    this.consume(TT.SEMICOLON, 'Expect ";" after return value.');
+
+    return new Stmt.Return(keyword, value);
   }
 
   private expressionStatement(): Stmt.Stmt {
