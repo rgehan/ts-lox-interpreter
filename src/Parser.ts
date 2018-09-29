@@ -11,8 +11,8 @@ import * as Stmt from './Stmt';
  * statement      → exprStmt | printStmt ;
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
- * expression     → block ;
- * block          → assignment ( "," equality)* ;
+ * expression     → comma ;
+ * comma          → assignment ( "," equality)* ;
  * assignment     → IDENTIFIER "=" assignment | equality ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
@@ -92,10 +92,10 @@ export class Parser {
   }
 
   private expression(): Expr.Expr {
-    return this.block();
+    return this.comma();
   }
 
-  private block(): Expr.Expr {
+  private comma(): Expr.Expr {
     let expr: Expr.Expr = this.assignment();
 
     while (this.match(TT.COMMA)) {
