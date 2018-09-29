@@ -104,6 +104,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
   }
 
+  visitVariableExpr(expr: Expr.Variable): any {
+    // TODO
+  }
+
   private checkNumberOperand(operator: Token, operand: any) {
     if (typeof operand === 'number') {
       return;

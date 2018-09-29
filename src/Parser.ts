@@ -39,10 +39,35 @@ export class Parser {
     const statements: Stmt.Stmt[] = [];
 
     while (!this.isAtEnd()) {
-      statements.push(this.statement());
+      statements.push(this.declaration());
     }
 
     return statements;
+  }
+
+  private declaration(): Stmt.Stmt {
+    try {
+      if (this.match(TT.VAR)) {
+        return this.varDeclaration();
+      }
+
+      return this.statement();
+    } catch (error) {
+      this.synchronize();
+      return null;
+    }
+  }
+
+  private varDeclaration(): Stmt.Stmt {
+    const name: Token = this.consume(TT.IDENTIFIER, 'Expect variable name.');
+
+    let initializer: Expr.Expr = null;
+    if (this.match(TT.EQUAL)) {
+      initializer = this.expression();
+    }
+
+    this.consume(TT.SEMICOLON, 'Expect ";" after variable declaration');
+    return new Stmt.Var(name, initializer);
   }
 
   private statement(): Stmt.Stmt {
@@ -148,6 +173,10 @@ export class Parser {
       return new Expr.Literal(this.previous().literal);
     }
 
+    if (this.match(TT.IDENTIFIER)) {
+      return new Expr.Variable(this.previous());
+    }
+
     if (this.match(TT.LEFT_PAREN)) {
       const expr: Expr.Expr = this.expression();
       this.consume(TT.RIGHT_PAREN, "Expect ')' after expression.");
@@ -228,7 +257,7 @@ export class Parser {
       throw this.error(this.peek(), message);
     }
 
-    this.advance();
+    return this.advance();
   }
 
   /**
