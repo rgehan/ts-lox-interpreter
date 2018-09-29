@@ -33,6 +33,10 @@ export class AstPrinter implements Expr.Visitor<string> {
     return expr.name.lexeme; // TODO
   }
 
+  visitLogicalExpr(expr: Expr.Logical): string {
+    return ''; // TODO;
+  }
+
   private parenthesize(name: string, ...exprs: Expr.Expr[]): string {
     const exprStrings = exprs.map(expr => ' ' + expr.accept(this));
     return `(${name}${exprStrings})`;

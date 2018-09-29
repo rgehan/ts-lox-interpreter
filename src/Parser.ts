@@ -8,14 +8,20 @@ import * as Stmt from './Stmt';
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement      → exprStmt | ifStmt | printStmt | block ;
+ * statement      → exprStmt
+ *                | ifStmt
+ *                | printStmt
+ *                | block ;
  * exprStmt       → expression ";" ;
  * ifStmt         → "if" "(" expression ")" statement ("else" statement)? ;
  * printStmt      → "print" expression ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → comma ;
  * comma          → assignment ( "," equality)* ;
- * assignment     → IDENTIFIER "=" assignment | equality ;
+ * assignment     → IDENTIFIER "=" assignment
+ *                | logic_or ;
+ * logic_or       → logic_and ( "or" logic_and )* ;
+ * logic_and      → equality ( "and" equality )* ;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
  * addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -136,7 +142,7 @@ export class Parser {
   }
 
   private assignment(): Expr.Expr {
-    const expr: Expr.Expr = this.equality();
+    const expr: Expr.Expr = this.or();
 
     if (this.match(TT.EQUAL)) {
       const equals: Token = this.previous();
@@ -148,6 +154,30 @@ export class Parser {
       }
 
       this.error(equals, 'Invalid assignment target.');
+    }
+
+    return expr;
+  }
+
+  private or(): Expr.Expr {
+    let expr: Expr.Expr = this.and();
+
+    while (this.match(TT.OR)) {
+      const operator: Token = this.previous();
+      const right: Expr.Expr = this.and();
+      expr = new Expr.Logical(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private and(): Expr.Expr {
+    let expr: Expr.Expr = this.equality();
+
+    while (this.match(TT.AND)) {
+      const operator: Token = this.previous();
+      const right: Expr.Expr = this.equality();
+      expr = new Expr.Logical(expr, operator, right);
     }
 
     return expr;

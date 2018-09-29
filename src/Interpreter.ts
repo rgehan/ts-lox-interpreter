@@ -136,6 +136,19 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
   }
 
+  visitLogicalExpr(expr: Expr.Logical): any {
+    const left = this.evaluate(expr.left);
+
+    switch (expr.operator.type) {
+      case TT.OR:
+        if (this.isTruthy(left)) return left;
+      case TT.AND:
+        if (!this.isTruthy(left)) return left;
+      default:
+        return this.evaluate(expr.right);
+    }
+  }
+
   visitVariableExpr(expr: Expr.Variable): any {
     return this.environment.get(expr.name);
   }
