@@ -18,6 +18,7 @@ import * as Stmt from './Stmt';
  *                | printStmt
  *                | returnStmt
  *                | breakStmt
+ *                | continueStmt
  *                | whileStmt
  *                | block ;
  * exprStmt       → expression ";" ;
@@ -28,7 +29,8 @@ import * as Stmt from './Stmt';
  * whileStmt      → "while" "(" expression ")" statement ;
  * printStmt      → "print" expression ";" ;
  * returnStmt     → "return" expression? ";" ;
- * breakStmt     → "break" ";" ;
+ * breakStmt      → "break" ";" ;
+ * continueStmt   → "continue" ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → comma ;
  * comma          → assignment ( "," equality)* ;
@@ -103,6 +105,7 @@ export class Parser {
     if (this.match(TT.PRINT)) return this.printStatement();
     if (this.match(TT.RETURN)) return this.returnStatement();
     if (this.match(TT.BREAK)) return this.breakStatement();
+    if (this.match(TT.CONTINUE)) return this.continueStatement();
     if (this.match(TT.LEFT_BRACE)) return new Stmt.Block(this.block());
 
     return this.expressionStatement();
@@ -196,8 +199,14 @@ export class Parser {
 
   private breakStatement(): Stmt.Stmt {
     const keyword: Token = this.previous();
-    this.consume(TT.SEMICOLON, 'Expect ";" after return value.');
+    this.consume(TT.SEMICOLON, 'Expect ";" after break keyword.');
     return new Stmt.Break(keyword);
+  }
+
+  private continueStatement(): Stmt.Stmt {
+    const keyword: Token = this.previous();
+    this.consume(TT.SEMICOLON, 'Expect ";" after continue keyword.');
+    return new Stmt.Continue(keyword);
   }
 
   private expressionStatement(): Stmt.Stmt {

@@ -9,6 +9,7 @@ import StdLib from './stdlib';
 import { LoxFunction } from './LoxFunction';
 import { Return } from './Return';
 import { Break } from './Break';
+import { Continue } from './Continue';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
@@ -68,7 +69,11 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
           break;
         }
 
-        // If this error is not due to a "break;", rethrow
+        if (error instanceof Continue) {
+          continue;
+        }
+
+        // If this error is not due to a "break;" or a "continue;", rethrow
         throw error;
       }
     }
@@ -91,6 +96,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitBreakStmt(stmt: Stmt.Break) {
     throw new Break();
+  }
+
+  visitContinueStmt(stmt: Stmt.Continue) {
+    throw new Continue();
   }
 
   visitVarStmt(stmt: Stmt.Var) {

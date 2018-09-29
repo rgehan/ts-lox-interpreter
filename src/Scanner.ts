@@ -22,6 +22,7 @@ const KEYWORDS: { [k: string]: TT } = {
   and: TT.AND,
   break: TT.BREAK,
   class: TT.CLASS,
+  continue: TT.CONTINUE,
   else: TT.ELSE,
   false: TT.FALSE,
   for: TT.FOR,

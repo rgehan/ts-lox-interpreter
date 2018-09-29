@@ -33,6 +33,7 @@ export enum TokenType {
   AND = 'AND',
   BREAK = 'BREAK',
   CLASS = 'CLASS',
+  CONTINUE = 'CONTINUE',
   ELSE = 'ELSE',
   FALSE = 'FALSE',
   FUN = 'FUN',
