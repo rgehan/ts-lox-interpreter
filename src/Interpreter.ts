@@ -24,6 +24,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     console.log(this.stringify(value));
   }
 
+  visitVarStmt(stmt: Stmt.Var) {
+    // TODO
+  }
+
   visitGroupingExpr(expr: Expr.Grouping): any {
     return this.evaluate(expr.expression);
   }

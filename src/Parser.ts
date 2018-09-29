@@ -5,7 +5,9 @@ import * as Expr from './Expr';
 import * as Stmt from './Stmt';
 
 /*
- * program        → statement* EOF ;
+ * program        → declaration* EOF ;
+ * declaration    → varDecl | statement ;
+ * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * statement      → exprStmt | printStmt ;
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
@@ -17,8 +19,10 @@ import * as Stmt from './Stmt';
  * multiplication → unary ( ( "/" | "*" ) unary )* ;
  * unary          → ( "!" | "-" ) unary
  *                | primary ;
- * primary        → NUMBER | STRING | "false" | "true" | "nil"
- *                | "(" expression ")" ;
+ * primary        → "false" | "true" | "nil" | "this"
+ *                | NUMBER | STRING
+ *                | "(" expression ")"
+ *                | IDENTIFIER;
  */
 
 class ParseError extends Error {}

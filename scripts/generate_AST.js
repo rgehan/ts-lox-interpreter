@@ -11,14 +11,19 @@ defineAST(
     'Grouping: Expr expression',
     'Literal:  Object value',
     'Unary:    Token operator, Expr right',
+    'Variable: Token name',
   ],
   ['Token']
 );
 
 defineAST(
   'Stmt',
-  ['Expression: Expr expression', 'Print: Expr expression'],
-  ['Expr']
+  [
+    'Expression: Expr expression',
+    'Print:      Expr expression',
+    'Var:        Token name, Expr initializer',
+  ],
+  ['Expr', 'Token']
 );
 
 function defineAST(baseName, types, imports) {
