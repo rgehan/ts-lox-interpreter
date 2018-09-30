@@ -5,8 +5,9 @@ import { Token } from './Token';
 import { TokenType as TT } from './TokenType';
 import { Environment } from './Environment';
 import { LoxCallable } from './LoxCallable';
-import StdLib from './stdlib';
 import { LoxFunction } from './LoxFunction';
+import { LoxClass } from './LoxClass';
+import StdLib from './stdlib';
 import { Return } from './Return';
 import { Break } from './Break';
 import { Continue } from './Continue';
@@ -47,6 +48,12 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
   visitExpressionStmt(stmt: Stmt.Expression) {
     this.evaluate(stmt.expression);
+  }
+
+  visitClassStmt(stmt: Stmt.Class) {
+    this.environment.define(stmt.name.lexeme, null);
+    const klass = new LoxClass(stmt.name.lexeme);
+    this.environment.assign(stmt.name, klass);
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {

@@ -48,6 +48,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     this.define(stmt.name);
   }
 
+  visitClassStmt(stmt: Stmt.Class) {
+    this.declare(stmt.name);
+    this.define(stmt.name);
+  }
+
   visitFunctionStmt(stmt: Stmt.Function) {
     const fnExpr = stmt.expression as Expr.Function;
 

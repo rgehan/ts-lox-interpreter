@@ -11,39 +11,38 @@ defineAST(
     'Binary:   Expr left, Token operator, Expr right',
     'Call:     Expr callee, Token paren, Expr[] args',
     'Grouping: Expr expression',
-    'Function: Token keyword, Token name, Token[] params, Stmt[] body',
+    'Function: Token keyword, Token name, Token[] params, Stmt.Stmt[] body',
     'Literal:  Object value',
     'Logical:  Expr left, Token operator, Expr right',
     'Unary:    Token operator, Expr right',
     'Variable: Token name',
   ],
-  ['Token', 'Stmt']
+  [`import { Token } from './Token';`, `import * as Stmt from './Stmt';`]
 );
 
 defineAST(
   'Stmt',
   [
     'Block:      Stmt[] statements',
+    'Class:      Token name, Function[] methods',
     'Break:      Token keyword',
     'Continue:   Token keyword',
-    'Expression: Expr expression',
-    'Function:   Expr expression',
-    'If:         Expr condition, Stmt thenBranch, Stmt elseBranch',
-    'While:      Expr condition, Stmt body',
-    'Print:      Expr expression',
-    'Return:     Token keyword, Expr value',
-    'Var:        Token name, Expr initializer',
+    'Expression: Expr.Expr expression',
+    'Function:   Expr.Function expression',
+    'If:         Expr.Expr condition, Stmt thenBranch, Stmt elseBranch',
+    'While:      Expr.Expr condition, Stmt body',
+    'Print:      Expr.Expr expression',
+    'Return:     Token keyword, Expr.Expr value',
+    'Var:        Token name, Expr.Expr initializer',
   ],
-  ['Expr', 'Token']
+  [`import * as Expr from './Expr';`, `import { Token } from './Token';`]
 );
 
 function defineAST(baseName, types, imports) {
   const filepath = path.resolve(__dirname, `../src/${baseName}.ts`);
 
   let content = `
-${imports
-    .map(importName => `import { ${importName} } from './${importName}';`)
-    .join('\n')}
+${imports.join('\n')}
 
 ${defineVisitor(baseName, types)}
 

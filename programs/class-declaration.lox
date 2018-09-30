@@ -1,0 +1,11 @@
+class Breakfast {
+  cook() {
+    print "Eggs a-frying";
+  }
+
+  serve(who) {
+    print "Enjoy you breakfast, " + who + ".";
+  }
+}
+
+print Breakfast;

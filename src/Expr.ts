@@ -1,5 +1,5 @@
 import { Token } from './Token';
-import { Stmt } from './Stmt';
+import * as Stmt from './Stmt';
 
 export interface Visitor<T> {
   visitAssignExpr(expr: Assign): T;
@@ -83,9 +83,9 @@ export class Function extends Expr {
   keyword: Token;
   name: Token;
   params: Token[];
-  body: Stmt[];
+  body: Stmt.Stmt[];
 
-  constructor(keyword: Token, name: Token, params: Token[], body: Stmt[]) {
+  constructor(keyword: Token, name: Token, params: Token[], body: Stmt.Stmt[]) {
     super();
     this.keyword = keyword;
     this.name = name;

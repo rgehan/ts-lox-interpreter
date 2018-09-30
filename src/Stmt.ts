@@ -1,8 +1,9 @@
-import { Expr } from './Expr';
+import * as Expr from './Expr';
 import { Token } from './Token';
 
 export interface Visitor<T> {
   visitBlockStmt(stmt: Block): T;
+  visitClassStmt(stmt: Class): T;
   visitBreakStmt(stmt: Break): T;
   visitContinueStmt(stmt: Continue): T;
   visitExpressionStmt(stmt: Expression): T;
@@ -28,6 +29,21 @@ export class Block extends Stmt {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitBlockStmt(this);
+  }
+}
+
+export class Class extends Stmt {
+  name: Token;
+  methods: Function[];
+
+  constructor(name: Token, methods: Function[]) {
+    super();
+    this.name = name;
+    this.methods = methods;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitClassStmt(this);
   }
 }
 
@@ -58,9 +74,9 @@ export class Continue extends Stmt {
 }
 
 export class Expression extends Stmt {
-  expression: Expr;
+  expression: Expr.Expr;
 
-  constructor(expression: Expr) {
+  constructor(expression: Expr.Expr) {
     super();
     this.expression = expression;
   }
@@ -71,9 +87,9 @@ export class Expression extends Stmt {
 }
 
 export class Function extends Stmt {
-  expression: Expr;
+  expression: Expr.Function;
 
-  constructor(expression: Expr) {
+  constructor(expression: Expr.Function) {
     super();
     this.expression = expression;
   }
@@ -84,11 +100,11 @@ export class Function extends Stmt {
 }
 
 export class If extends Stmt {
-  condition: Expr;
+  condition: Expr.Expr;
   thenBranch: Stmt;
   elseBranch: Stmt;
 
-  constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt) {
+  constructor(condition: Expr.Expr, thenBranch: Stmt, elseBranch: Stmt) {
     super();
     this.condition = condition;
     this.thenBranch = thenBranch;
@@ -101,10 +117,10 @@ export class If extends Stmt {
 }
 
 export class While extends Stmt {
-  condition: Expr;
+  condition: Expr.Expr;
   body: Stmt;
 
-  constructor(condition: Expr, body: Stmt) {
+  constructor(condition: Expr.Expr, body: Stmt) {
     super();
     this.condition = condition;
     this.body = body;
@@ -116,9 +132,9 @@ export class While extends Stmt {
 }
 
 export class Print extends Stmt {
-  expression: Expr;
+  expression: Expr.Expr;
 
-  constructor(expression: Expr) {
+  constructor(expression: Expr.Expr) {
     super();
     this.expression = expression;
   }
@@ -130,9 +146,9 @@ export class Print extends Stmt {
 
 export class Return extends Stmt {
   keyword: Token;
-  value: Expr;
+  value: Expr.Expr;
 
-  constructor(keyword: Token, value: Expr) {
+  constructor(keyword: Token, value: Expr.Expr) {
     super();
     this.keyword = keyword;
     this.value = value;
@@ -145,9 +161,9 @@ export class Return extends Stmt {
 
 export class Var extends Stmt {
   name: Token;
-  initializer: Expr;
+  initializer: Expr.Expr;
 
-  constructor(name: Token, initializer: Expr) {
+  constructor(name: Token, initializer: Expr.Expr) {
     super();
     this.name = name;
     this.initializer = initializer;

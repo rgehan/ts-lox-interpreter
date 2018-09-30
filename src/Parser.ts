@@ -6,9 +6,11 @@ import * as Stmt from './Stmt';
 
 /*
  * program        → declaration* EOF ;
- * declaration    → funDecl
+ * declaration    → classDecl
+ *                | funDecl
  *                | varDecl
  *                | statement
+ * classDecl      → "class" IDENTIFIER "{" function* "}" ;
  * funDecl        → "fun" function
  * function       → IDENTIFIER? "(" parameters? ")" block ;
  * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
@@ -77,6 +79,7 @@ export class Parser {
 
   private declaration(): Stmt.Stmt {
     try {
+      if (this.match(TT.CLASS)) return this.classDeclaration();
       if (this.match(TT.FUN)) return this.functionDeclaration('function');
       if (this.match(TT.VAR)) return this.varDeclaration();
 
@@ -85,6 +88,26 @@ export class Parser {
       this.synchronize();
       return null;
     }
+  }
+
+  private classDeclaration(): Stmt.Stmt {
+    const name = this.consume(TT.IDENTIFIER, 'Expect class name.');
+    this.consume(TT.LEFT_BRACE, 'Expect "{" before class body.');
+
+    const methods: Stmt.Function[] = [];
+    while (!this.check(TT.RIGHT_BRACE) && !this.isAtEnd()) {
+      const fnExpr: Expr.Function = this.function('method');
+
+      if (fnExpr.name === null) {
+        this.error(fnExpr.keyword, 'Class methods need to have a name.');
+      }
+
+      methods.push(new Stmt.Function(fnExpr));
+    }
+
+    this.consume(TT.RIGHT_BRACE, 'Expect "}" after class body.');
+
+    return new Stmt.Class(name, methods);
   }
 
   private varDeclaration(): Stmt.Stmt {
