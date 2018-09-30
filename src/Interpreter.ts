@@ -297,6 +297,10 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     throw new RuntimeError(expr.name, 'Only instances have fields.');
   }
 
+  visitThisExpr(expr: Expr.This): any {
+    return this.lookupVariable(expr.keyword, expr);
+  }
+
   visitVariableExpr(expr: Expr.Variable): any {
     return this.lookupVariable(expr.name, expr);
   }

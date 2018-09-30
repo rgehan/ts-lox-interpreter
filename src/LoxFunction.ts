@@ -3,6 +3,7 @@ import * as Expr from './Expr';
 import { Interpreter } from './Interpreter';
 import { Environment } from './Environment';
 import { Return } from './Return';
+import { LoxInstance } from './LoxInstance';
 
 export class LoxFunction extends LoxCallable {
   declaration: Expr.Function;
@@ -12,6 +13,12 @@ export class LoxFunction extends LoxCallable {
     super();
     this.declaration = declaration;
     this.closure = closure;
+  }
+
+  bind(instance: LoxInstance): LoxFunction {
+    const environment = new Environment(this.closure);
+    environment.define('this', instance);
+    return new LoxFunction(this.declaration, environment);
   }
 
   arity() {

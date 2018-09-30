@@ -472,6 +472,10 @@ export class Parser {
       return new Expr.Literal(this.previous().literal);
     }
 
+    if (this.match(TT.THIS)) {
+      return new Expr.This(this.previous());
+    }
+
     if (this.match(TT.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
     }

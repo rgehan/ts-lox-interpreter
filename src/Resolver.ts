@@ -51,13 +51,17 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
 
   visitClassStmt(stmt: Stmt.Class) {
     this.declare(stmt.name);
+    this.define(stmt.name);
+
+    this.beginScope();
+    this.scopes.peek().set('this', true);
 
     for (const method of stmt.methods) {
       const declaration = FunctionType.METHOD;
       this.resolveFunction(method.expression, declaration);
     }
 
-    this.define(stmt.name);
+    this.endScope();
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {
@@ -165,6 +169,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   visitSetExpr(expr: Expr.Set) {
     this.resolve(expr.value);
     this.resolve(expr.object);
+  }
+
+  visitThisExpr(expr: Expr.This) {
+    this.resolveLocal(expr, expr.keyword);
   }
 
   visitUnaryExpr(expr: Expr.Unary) {

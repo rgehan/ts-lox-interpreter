@@ -17,7 +17,7 @@ export class LoxClass extends LoxCallable {
 
   findMethod(instance: LoxInstance, name: string): LoxFunction {
     if (this.methods.has(name)) {
-      return this.methods.get(name);
+      return this.methods.get(name).bind(instance);
     }
 
     return null;
