@@ -9,3 +9,7 @@ class Breakfast {
 }
 
 print Breakfast;
+
+var instance = Breakfast();
+
+print instance;
