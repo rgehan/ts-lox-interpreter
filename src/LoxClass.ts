@@ -1,13 +1,26 @@
 import { LoxCallable } from './LoxCallable';
 import { Interpreter } from './Interpreter';
 import { LoxInstance } from './LoxInstance';
+import { LoxFunction } from './LoxFunction';
+
+export type Methods = Map<string, LoxFunction>;
 
 export class LoxClass extends LoxCallable {
   name: string;
+  methods: Methods;
 
-  constructor(name: string) {
+  constructor(name: string, methods: Methods) {
     super();
     this.name = name;
+    this.methods = methods;
+  }
+
+  findMethod(instance: LoxInstance, name: string): LoxFunction {
+    if (this.methods.has(name)) {
+      return this.methods.get(name);
+    }
+
+    return null;
   }
 
   arity(): number {

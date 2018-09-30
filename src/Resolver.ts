@@ -8,6 +8,7 @@ type Scope = Map<string, boolean>;
 type Resolveable = Expr.Expr | Stmt.Stmt;
 enum FunctionType {
   NONE,
+  METHOD,
   FUNCTION,
 }
 enum LoopType {
@@ -50,6 +51,12 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
 
   visitClassStmt(stmt: Stmt.Class) {
     this.declare(stmt.name);
+
+    for (const method of stmt.methods) {
+      const declaration = FunctionType.METHOD;
+      this.resolveFunction(method.expression, declaration);
+    }
+
     this.define(stmt.name);
   }
 
