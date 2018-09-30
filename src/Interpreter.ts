@@ -278,6 +278,18 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
   }
 
+  visitSetExpr(expr: Expr.Set): any {
+    const object = this.evaluate(expr.object);
+
+    if (object instanceof LoxInstance) {
+      const value = this.evaluate(expr.value);
+      object.set(expr.name, value);
+      return value;
+    }
+
+    throw new RuntimeError(expr.name, 'Only instances have fields.');
+  }
+
   visitVariableExpr(expr: Expr.Variable): any {
     return this.lookupVariable(expr.name, expr);
   }

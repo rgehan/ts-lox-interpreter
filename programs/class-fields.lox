@@ -1,0 +1,21 @@
+class Klass {
+  method() {
+    print "method was called";
+  }
+}
+
+var instance1 = Klass();
+var instance2 = Klass();
+
+fun printInstancesFields() {
+  print "Instance1: " + instance1.field;
+  print "Instance2: " + instance2.field;
+}
+
+instance1.field = instance2.field = "hello ";
+
+printInstancesFields();
+
+instance2.field = "world";
+
+printInstancesFields();

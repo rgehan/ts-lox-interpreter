@@ -36,7 +36,7 @@ import * as Stmt from './Stmt';
  * continueStmt   → "continue" ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → assignment ;
- * assignment     → IDENTIFIER "=" assignment
+ * assignment     → ( call "." )? IDENTIFIER "=" assignment
  *                | logic_or ;
  * logic_or       → logic_and ( "or" logic_and )* ;
  * logic_and      → equality ( "and" equality )* ;
@@ -304,8 +304,9 @@ export class Parser {
       const value: Expr.Expr = this.assignment();
 
       if (expr instanceof Expr.Variable) {
-        const name: Token = (expr as Expr.Variable).name;
-        return new Expr.Assign(name, value);
+        return new Expr.Assign(expr.name, value);
+      } else if (expr instanceof Expr.Get) {
+        return new Expr.Set(expr.object, expr.name, value);
       }
 
       this.error(equals, 'Invalid assignment target.');
