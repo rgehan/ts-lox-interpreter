@@ -11,6 +11,7 @@ import StdLib from './stdlib';
 import { Return } from './Return';
 import { Break } from './Break';
 import { Continue } from './Continue';
+import { LoxInstance } from './LoxInstance';
 
 export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   globals: Environment;
@@ -252,6 +253,16 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     }
 
     return fn.call(this, args);
+  }
+
+  visitGetExpr(expr: Expr.Get) {
+    const object = this.evaluate(expr.object);
+
+    if (object instanceof LoxInstance) {
+      return object.get(expr.name);
+    }
+
+    throw new RuntimeError(expr.name, 'Only instances have properties');
   }
 
   visitLogicalExpr(expr: Expr.Logical): any {

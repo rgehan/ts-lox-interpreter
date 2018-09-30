@@ -10,6 +10,7 @@ defineAST(
     'Assign:   Token name, Expr value',
     'Binary:   Expr left, Token operator, Expr right',
     'Call:     Expr callee, Token paren, Expr[] args',
+    'Get:      Expr object, Token name',
     'Grouping: Expr expression',
     'Function: Token keyword, Token name, Token[] params, Stmt.Stmt[] body',
     'Literal:  Object value',

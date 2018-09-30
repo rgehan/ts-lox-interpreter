@@ -5,6 +5,7 @@ export interface Visitor<T> {
   visitAssignExpr(expr: Assign): T;
   visitBinaryExpr(expr: Binary): T;
   visitCallExpr(expr: Call): T;
+  visitGetExpr(expr: Get): T;
   visitGroupingExpr(expr: Grouping): T;
   visitFunctionExpr(expr: Function): T;
   visitLiteralExpr(expr: Literal): T;
@@ -63,6 +64,21 @@ export class Call extends Expr {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitCallExpr(this);
+  }
+}
+
+export class Get extends Expr {
+  object: Expr;
+  name: Token;
+
+  constructor(object: Expr, name: Token) {
+    super();
+    this.object = object;
+    this.name = name;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitGetExpr(this);
   }
 }
 
