@@ -15,18 +15,24 @@ enum LoopType {
   NONE,
   LOOP,
 }
+enum ClassType {
+  NONE,
+  CLASS,
+}
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   interpreter: Interpreter;
   scopes: Stack<Scope>;
   currentFunction: FunctionType;
   currentLoop: LoopType;
+  currentClass: ClassType;
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
     this.scopes = new Stack();
     this.currentFunction = FunctionType.NONE;
     this.currentLoop = LoopType.NONE;
+    this.currentClass = ClassType.NONE;
   }
 
   visitBlockStmt(stmt: Stmt.Block) {
@@ -50,6 +56,9 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   }
 
   visitClassStmt(stmt: Stmt.Class) {
+    const enclosingClass = this.currentClass;
+    this.currentClass = ClassType.CLASS;
+
     this.declare(stmt.name);
     this.define(stmt.name);
 
@@ -62,6 +71,8 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     this.endScope();
+
+    this.currentClass = enclosingClass;
   }
 
   visitFunctionStmt(stmt: Stmt.Function) {
@@ -172,6 +183,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
   }
 
   visitThisExpr(expr: Expr.This) {
+    if (this.currentClass === ClassType.NONE) {
+      Lox.errorAtToken(expr.keyword, 'Cannot use "this" outside of a class.');
+    }
+
     this.resolveLocal(expr, expr.keyword);
   }
 
