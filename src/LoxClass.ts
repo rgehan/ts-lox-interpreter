@@ -24,11 +24,22 @@ export class LoxClass extends LoxCallable {
   }
 
   arity(): number {
+    const initializer = this.methods.get('init');
+    if (initializer) {
+      return initializer.arity();
+    }
+
     return 0;
   }
 
   call(interpreter: Interpreter, args: any[]): any {
     const instance = new LoxInstance(this);
+
+    const initializer = this.methods.get('init');
+    if (initializer) {
+      initializer.bind(instance).call(interpreter, args);
+    }
+
     return instance;
   }
 

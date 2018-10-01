@@ -1,10 +1,9 @@
 class Person {
-  configure(name, age) {
+  init(name, age) {
     this.name = name;
     this.age = age;
-    return this;
   }
-  
+
   getDescriber() {
     return fun () {
       print "Hello, my name is " + this.name + " and I'm " + this.age + " years old.";
@@ -13,10 +12,9 @@ class Person {
 }
 
 // Create a person, get its describer then call it
-var person = Person();
-person.configure("Paul", 35);
+var person = Person("Paul", 35);
 person.getDescriber()();
 
 // Create a person and directly retrieve its describer
-var personDescriber = Person().configure("Emily", 25).getDescriber();
+var personDescriber = Person("Emily", 25).getDescriber();
 personDescriber();
