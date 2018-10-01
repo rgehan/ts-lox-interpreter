@@ -26,8 +26,8 @@ export class Environment {
     throw new RuntimeError(varToken, `Undefined variable '${variableName}'.`);
   }
 
-  getAt(distance: number, name: string): any {
-    return this.ancestor(distance).values.get(name);
+  getAt(distance: number, name: Token): any {
+    return this.ancestor(distance).values.get(name.lexeme);
   }
 
   assign(varToken: Token, value: any): any {

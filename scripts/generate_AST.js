@@ -7,7 +7,7 @@ const { chain } = require('lodash');
 defineAST(
   'Expr',
   [
-    'Assign:   Token name, Expr value',
+    'Assign:   Token name, Token operator, Expr value',
     'Binary:   Expr left, Token operator, Expr right',
     'Call:     Expr callee, Token paren, Expr[] args',
     'Get:      Expr object, Token name',
@@ -15,7 +15,7 @@ defineAST(
     'Function: Token keyword, Token name, Token[] params, Stmt.Stmt[] body',
     'Literal:  Object value',
     'Logical:  Expr left, Token operator, Expr right',
-    'Set:      Expr object, Token name, Expr value',
+    'Set:      Expr object, Token name, Token operator, Expr value',
     'This:     Token keyword',
     'Unary:    Token operator, Expr right',
     'Variable: Token name',

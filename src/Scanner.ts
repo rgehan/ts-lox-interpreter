@@ -10,10 +10,7 @@ const CHAR_TO_TOKEN_MAP: { [k: string]: TT } = {
   '}': TT.RIGHT_BRACE,
   ',': TT.COMMA,
   '.': TT.DOT,
-  '-': TT.MINUS,
-  '+': TT.PLUS,
   ';': TT.SEMICOLON,
-  '*': TT.STAR,
   '%': TT.PERCENT,
   '^': TT.HAT,
 };
@@ -77,6 +74,15 @@ export class Scanner {
     }
 
     switch (char) {
+      case '+':
+        this.addToken(this.match('=') ? TT.PLUS_EQUAL : TT.PLUS);
+        break;
+      case '-':
+        this.addToken(this.match('=') ? TT.MINUS_EQUAL : TT.MINUS);
+        break;
+      case '*':
+        this.addToken(this.match('=') ? TT.STAR_EQUAL : TT.STAR);
+        break;
       case '!':
         this.addToken(this.match('=') ? TT.BANG_EQUAL : TT.BANG);
         break;
@@ -92,6 +98,11 @@ export class Scanner {
 
       // Handle both the division operator and single-line comments
       case '/':
+        if (this.match('=')) {
+          this.addToken(TT.SLASH_EQUAL);
+          break;
+        }
+
         if (!this.match('/')) {
           this.addToken(TT.SLASH);
           break;

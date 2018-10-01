@@ -2,7 +2,7 @@ import { Lox } from './Lox';
 import * as Expr from './Expr';
 import * as Stmt from './Stmt';
 import { Token } from './Token';
-import { TokenType as TT } from './TokenType';
+import { TokenType as TT, TokenType } from './TokenType';
 import { Environment } from './Environment';
 import { LoxCallable } from './LoxCallable';
 import { LoxFunction } from './LoxFunction';
@@ -133,13 +133,52 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
   }
 
   visitAssignExpr(expr: Expr.Assign): any {
-    const value = this.evaluate(expr.value);
+    let value = this.evaluate(expr.value);
     const distance = this.locals.get(expr);
 
+    switch (expr.operator.type) {
+      case TT.EQUAL: {
+        return this.setVariable(expr.name, distance, value);
+      }
+      case TT.PLUS_EQUAL: {
+        const newValue = this.getVariable(expr.name, distance) + value;
+        return this.setVariable(expr.name, distance, newValue);
+      }
+      case TT.MINUS_EQUAL: {
+        const newValue = this.getVariable(expr.name, distance) - value;
+        return this.setVariable(expr.name, distance, newValue);
+      }
+      case TT.STAR_EQUAL: {
+        const newValue = this.getVariable(expr.name, distance) * value;
+        return this.setVariable(expr.name, distance, newValue);
+      }
+      case TT.SLASH_EQUAL: {
+        const newValue = this.getVariable(expr.name, distance) / value;
+        return this.setVariable(expr.name, distance, newValue);
+      }
+    }
+
+    return value;
+  }
+
+  setVariable(name: Token, distance: number, value: any) {
     if (distance === undefined) {
-      this.globals.assign(expr.name, value);
+      this.globals.assign(name, value);
     } else {
-      this.environment.assignAt(distance, expr.name, value);
+      this.environment.assignAt(distance, name, value);
+    }
+
+    return value;
+  }
+
+  getVariable(name: Token, distance: number): any {
+    const value =
+      distance === undefined
+        ? this.globals.get(name)
+        : this.environment.getAt(distance, name);
+
+    if (value === undefined) {
+      throw new RuntimeError(name, 'Variable is not declared.');
     }
 
     return value;
@@ -312,7 +351,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
       return this.globals.get(name);
     }
 
-    return this.environment.getAt(distance, name.lexeme);
+    return this.environment.getAt(distance, name);
   }
 
   private checkNumberOperand(operator: Token, operand: any) {

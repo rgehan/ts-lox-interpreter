@@ -1,0 +1,11 @@
+var a = 1;
+
+fun incrementAndPrint () {
+  a += 1;
+  print a;
+}
+
+incrementAndPrint();
+incrementAndPrint();
+incrementAndPrint();
+incrementAndPrint();

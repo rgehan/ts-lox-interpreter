@@ -22,11 +22,13 @@ export abstract class Expr {
 
 export class Assign extends Expr {
   name: Token;
+  operator: Token;
   value: Expr;
 
-  constructor(name: Token, value: Expr) {
+  constructor(name: Token, operator: Token, value: Expr) {
     super();
     this.name = name;
+    this.operator = operator;
     this.value = value;
   }
 
@@ -149,12 +151,14 @@ export class Logical extends Expr {
 export class Set extends Expr {
   object: Expr;
   name: Token;
+  operator: Token;
   value: Expr;
 
-  constructor(object: Expr, name: Token, value: Expr) {
+  constructor(object: Expr, name: Token, operator: Token, value: Expr) {
     super();
     this.object = object;
     this.name = name;
+    this.operator = operator;
     this.value = value;
   }
 
