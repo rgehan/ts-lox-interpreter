@@ -8,11 +8,17 @@ import { LoxInstance } from './LoxInstance';
 export class LoxFunction extends LoxCallable {
   declaration: Expr.Function;
   closure: Environment;
+  isInitializer: boolean;
 
-  constructor(declaration: Expr.Function, closure: Environment) {
+  constructor(
+    declaration: Expr.Function,
+    closure: Environment,
+    isInitializer: boolean = false
+  ) {
     super();
     this.declaration = declaration;
     this.closure = closure;
+    this.isInitializer = isInitializer;
   }
 
   bind(instance: LoxInstance): LoxFunction {
@@ -44,6 +50,11 @@ export class LoxFunction extends LoxCallable {
       }
 
       throw error;
+    }
+
+    // If this is the constructor, always return 'this'
+    if (this.isInitializer) {
+      return this.closure.getAt(0, 'this');
     }
 
     return null;

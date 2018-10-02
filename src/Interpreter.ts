@@ -56,7 +56,14 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
 
     const methods: Methods = new Map();
     for (const method of stmt.methods) {
-      const fn = new LoxFunction(method.expression, this.environment);
+      const isInitializer = method.expression.name.lexeme === 'init';
+
+      const fn = new LoxFunction(
+        method.expression,
+        this.environment,
+        isInitializer
+      );
+
       methods.set(method.expression.name.lexeme, fn);
     }
 
@@ -175,7 +182,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
     const value =
       distance === undefined
         ? this.globals.get(name)
-        : this.environment.getAt(distance, name);
+        : this.environment.getAt(distance, name.lexeme);
 
     if (value === undefined) {
       throw new RuntimeError(name, 'Variable is not declared.');
@@ -351,7 +358,7 @@ export class Interpreter implements Expr.Visitor<any>, Stmt.Visitor<void> {
       return this.globals.get(name);
     }
 
-    return this.environment.getAt(distance, name);
+    return this.environment.getAt(distance, name.lexeme);
   }
 
   private checkNumberOperand(operator: Token, operand: any) {
