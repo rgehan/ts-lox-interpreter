@@ -1,0 +1,17 @@
+class Person {
+  init(name) {
+    if (name == "Paul") {
+      this.name = "The Best";
+      return;
+    }
+
+    this.name = name;
+  }
+
+  describe() {
+    print "Hi, I'm " + this.name;
+  }
+}
+
+var paul = Person("Paul").describe();
+var jack = Person("Jack").describe();

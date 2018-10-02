@@ -10,6 +10,7 @@ enum FunctionType {
   NONE,
   METHOD,
   FUNCTION,
+  INITIALIZER,
 }
 enum LoopType {
   NONE,
@@ -66,7 +67,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     this.scopes.peek().set('this', true);
 
     for (const method of stmt.methods) {
-      const declaration = FunctionType.METHOD;
+      const declaration =
+        method.expression.name.lexeme === 'init'
+          ? FunctionType.INITIALIZER
+          : FunctionType.METHOD;
+
       this.resolveFunction(method.expression, declaration);
     }
 
@@ -102,6 +107,13 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     if (stmt.value) {
+      if (this.currentFunction === FunctionType.INITIALIZER) {
+        Lox.errorAtToken(
+          stmt.keyword,
+          'Cannot return a value from class constructor.'
+        );
+      }
+
       this.resolve(stmt.value);
     }
   }

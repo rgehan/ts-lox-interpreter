@@ -211,7 +211,7 @@ export class Parser {
   private returnStatement(): Stmt.Stmt {
     const keyword: Token = this.previous();
 
-    let value: Expr.Expr;
+    let value: Expr.Expr = null;
     if (!this.check(TT.SEMICOLON)) {
       value = this.expression();
     }
